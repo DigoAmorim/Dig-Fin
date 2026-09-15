@@ -1,39 +1,21 @@
 import React, { useState } from 'react';
-type IconProps = { className?: string };
-
-const Icon: React.FC<IconProps> = ({ className }) => (
-  <svg
-    className={className}
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="8" />
-    <path d="M12 8v8M8 12h8" />
-  </svg>
-);
-
-const Wallet = Icon;
-const ArrowRightLeft = Icon;
-const PieChart = Icon;
-const TrendingUp = Icon;
-const Target = Icon;
-const Repeat = Icon;
-const Tags = Icon;
-const Users = Icon;
-const GitBranch = Icon;
-const Search = Icon;
-const ChevronDown = Icon;
-const ArrowUpRight = Icon;
-const CheckCircle2 = Icon;
-const CreditCard = Icon;
-const Building2 = Icon;
+import {
+  ArrowRightLeft,
+  ArrowUpRight,
+  Building2,
+  CheckCircle2,
+  ChevronDown,
+  CreditCard,
+  GitBranch,
+  PieChart,
+  Repeat,
+  Search,
+  Tags,
+  Target,
+  TrendingUp,
+  Users,
+  Wallet,
+} from 'lucide-react';
 
 // --- Tipos de Dados ---
 interface Transaction {
