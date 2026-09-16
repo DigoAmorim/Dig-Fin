@@ -154,7 +154,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             />
           </button>
           {expandedSections.settings && <nav className="space-y-0.5 text-sm">
-            <button className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer">
+            <button
+              onClick={() => setActivePage('card-brands')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'card-brands'
+                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
               <Target className="w-4 h-4" />
               Bandeira do Cartão
             </button>
