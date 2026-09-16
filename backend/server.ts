@@ -18,7 +18,7 @@ app.use(express.json());
 app.use((_req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
     res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
+    res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
     if (_req.method === 'OPTIONS') {
         res.sendStatus(204);
         return;
@@ -53,6 +53,59 @@ app.post('/api/bandeiras-cartao', async (req: Request, res: Response) => {
         [description],
     );
     res.status(201).json(result.rows[0]);
+});
+
+app.put('/api/bandeiras-cartao/:id', async (req: Request, res: Response) => {
+    const description = String(req.body?.description ?? '').trim();
+    const { id } = req.params;
+
+    if (!description) {
+        res.status(400).json({ message: 'A descrição é obrigatória.' });
+        return;
+    }
+
+    if (!pool) {
+        const cardBrand = memoryCardBrands.find((brand) => brand.id === id);
+        if (!cardBrand) {
+            res.sendStatus(404);
+            return;
+        }
+        cardBrand.description = description;
+        res.json(cardBrand);
+        return;
+    }
+
+    const result = await pool.query<CardBrand>(
+        'UPDATE card_brands SET description = $1 WHERE id = $2 RETURNING id, description',
+        [description, id],
+    );
+    if (result.rowCount === 0) {
+        res.sendStatus(404);
+        return;
+    }
+    res.json(result.rows[0]);
+});
+
+app.delete('/api/bandeiras-cartao/:id', async (req: Request, res: Response) => {
+    const { id } = req.params;
+
+    if (!pool) {
+        const index = memoryCardBrands.findIndex((brand) => brand.id === id);
+        if (index === -1) {
+            res.sendStatus(404);
+            return;
+        }
+        memoryCardBrands.splice(index, 1);
+        res.sendStatus(204);
+        return;
+    }
+
+    const result = await pool.query('DELETE FROM card_brands WHERE id = $1', [id]);
+    if (result.rowCount === 0) {
+        res.sendStatus(404);
+        return;
+    }
+    res.sendStatus(204);
 });
 
 app.get('/', (_req: Request, res: Response) => {
