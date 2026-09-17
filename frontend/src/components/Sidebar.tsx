@@ -6,7 +6,6 @@ import {
   CreditCard,
   GitBranch,
   PieChart,
-  Repeat,
   ChevronRight,
   Search,
   Tags,
@@ -165,9 +164,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               <Target className="w-4 h-4" />
               Bandeira do Cartão
             </button>
-            <button className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer">
-              <Repeat className="w-4 h-4" />
-              Recurring
+            <button
+              onClick={() => setActivePage('credit-cards')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'credit-cards'
+                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <CreditCard className="w-4 h-4" />
+              Cartão de Crédito
             </button>
             <button className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer">
               <Tags className="w-4 h-4" />

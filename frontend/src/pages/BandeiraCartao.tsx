@@ -1,6 +1,12 @@
 import { type FormEvent, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { BandeiraCartaoApiError, bandeiraCartaoApi } from '../lib/BandeiraCartaoApi.ts';
+import type { BandeiraCartao } from '../types/BandeiraCartao.ts';
 import { Button } from '../components/ui/Button.tsx';
+import { Input } from '../components/ui/Input.tsx';
+import { Label } from '../components/ui/Label.tsx';
 import {
   Dialog,
   DialogContent,
@@ -10,48 +16,31 @@ import {
 } from '../components/ui/Dialog.tsx';
 import { PageHeader } from '../components/PageHeader.tsx';
 
-interface CardBrand {
-  id: string;
-  description: string;
-}
-
-const API_URL = 'http://localhost:3000/api/bandeiras-cartao';
-
 export function CardBrands() {
-  const [cardBrands, setCardBrands] = useState<CardBrand[]>([]);
+  const { t } = useTranslation();
+  const [cardBrands, setCardBrands] = useState<BandeiraCartao[]>([]);
   const [description, setDescription] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<CardBrand | null>(null);
-  const [deletingBrand, setDeletingBrand] = useState<CardBrand | null>(null);
+  const [editingBrand, setEditingBrand] = useState<BandeiraCartao | null>(null);
+  const [deletingBrand, setDeletingBrand] = useState<BandeiraCartao | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    fetch(API_URL)
-      .then((response) => {
-        if (!response.ok) throw new Error('Não foi possível carregar as bandeiras.');
-        return response.json() as Promise<CardBrand[]>;
-      })
+    bandeiraCartaoApi.list()
       .then(setCardBrands)
-      .catch(() => setError('Não foi possível carregar as bandeiras.'))
+      .catch(() => setError(t('cardBrands.loadError')))
       .finally(() => setIsLoading(false));
   }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setFormError('');
     try {
-      const response = await fetch(editingBrand ? `${API_URL}/${editingBrand.id}` : API_URL, {
-        method: editingBrand ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ description }),
-      });
-
-      if (!response.ok) {
-        setError(editingBrand ? 'Não foi possível atualizar a bandeira.' : 'Não foi possível salvar a bandeira.');
-        return;
-      }
-
-      const saved = await response.json() as CardBrand;
+      const saved = editingBrand
+        ? await bandeiraCartaoApi.update(editingBrand.id, { description })
+        : await bandeiraCartaoApi.create({ description });
       setCardBrands((current) => {
         const next = editingBrand
           ? current.map((brand) => brand.id === saved.id ? saved : brand)
@@ -61,21 +50,27 @@ export function CardBrands() {
       setDescription('');
       setIsFormOpen(false);
       setEditingBrand(null);
-      setError('');
-    } catch {
-      setError(editingBrand ? 'Não foi possível atualizar a bandeira.' : 'Não foi possível salvar a bandeira.');
+      toast.success(editingBrand ? t('cardBrands.updated') : t('cardBrands.created'));
+    } catch (submissionError) {
+      if (submissionError instanceof BandeiraCartaoApiError && submissionError.statusCode === 409) {
+        setFormError(t('cardBrands.duplicateError'));
+        return;
+      }
+      setFormError(editingBrand ? t('cardBrands.updateError') : t('cardBrands.createError'));
     }
   };
 
   const openCreateDialog = () => {
     setEditingBrand(null);
     setDescription('');
+    setFormError('');
     setIsFormOpen(true);
   };
 
-  const openEditDialog = (brand: CardBrand) => {
+  const openEditDialog = (brand: BandeiraCartao) => {
     setEditingBrand(brand);
     setDescription(brand.description);
+    setFormError('');
     setIsFormOpen(true);
   };
 
@@ -83,52 +78,57 @@ export function CardBrands() {
     if (!deletingBrand) return;
 
     try {
-      const response = await fetch(`${API_URL}/${deletingBrand.id}`, { method: 'DELETE' });
-      if (!response.ok) {
-        setError('Não foi possível excluir a bandeira.');
-        return;
-      }
-
+      await bandeiraCartaoApi.remove(deletingBrand.id);
       setCardBrands((current) => current.filter((brand) => brand.id !== deletingBrand.id));
       setDeletingBrand(null);
       setError('');
+      toast.success(t('cardBrands.deleted'));
     } catch {
-      setError('Não foi possível excluir a bandeira.');
+      toast.error(t('cardBrands.deleteError'));
     }
   };
 
   return (
     <div className="space-y-4">
-      <PageHeader section="Bandeiras do Cartão" title="Bandeiras do Cartão" />
+      <PageHeader section={t('cardBrands.section')} title={t('cardBrands.title')} />
 
       <Dialog open={isFormOpen} onOpenChange={(open) => {
         setIsFormOpen(open);
-        if (!open) setEditingBrand(null);
+        if (!open) {
+          setEditingBrand(null);
+          setFormError('');
+        }
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingBrand ? 'Editar bandeira' : 'Nova bandeira'}</DialogTitle>
+            <DialogTitle>{editingBrand ? t('cardBrands.edit') : t('cardBrands.new')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <label htmlFor="card-brand-description" className="text-sm font-medium text-slate-700">
-                Descrição
-              </label>
-              <input
+              <Label htmlFor="card-brand-description" required>
+                {t('cardBrands.description')}
+              </Label>
+              <Input
                 id="card-brand-description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Ex.: Visa"
+                placeholder={t('cardBrands.descriptionPlaceholder')}
                 required
                 autoFocus
-                className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none placeholder:text-slate-400 focus:border-emerald-500"
+                hasError={Boolean(formError)}
+                aria-describedby={formError ? 'card-brand-description-error' : undefined}
               />
             </div>
+            {formError && (
+              <p id="card-brand-description-error" role="alert" className="text-sm text-rose-600">
+                {formError}
+              </p>
+            )}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => { setIsFormOpen(false); setEditingBrand(null); }}>
-                Cancelar
+              <Button type="button" variant="outline" onClick={() => { setIsFormOpen(false); setEditingBrand(null); setFormError(''); }}>
+                {t('common.cancel')}
               </Button>
-              <Button type="submit">Salvar</Button>
+              <Button type="submit">{t('common.save')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -137,31 +137,34 @@ export function CardBrands() {
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-200 flex items-center justify-between gap-3">
-          <h3 className="text-sm font-semibold text-slate-800">Bandeiras</h3>
+        <div className="flex items-center justify-end gap-3 border-b border-slate-200 px-5 py-4">
           <Button
             type="button"
             onClick={openCreateDialog}
             size="sm"
             className="gap-1.5"
           >
-            <Plus size={13} /> Adicionar Bandeira
+            <Plus size={13} /> {t('cardBrands.add')}
           </Button>
         </div>
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-500">
+          <span>{t('cardBrands.column')}</span>
+          <span className="w-[4.5rem] text-center">{t('common.actions')}</span>
+        </div>
         {isLoading ? (
-          <p className="px-5 py-6 text-sm text-slate-500">Carregando...</p>
+          <p className="px-5 py-6 text-sm text-slate-500">{t('common.loading')}</p>
         ) : cardBrands.length === 0 ? (
-          <p className="px-5 py-6 text-sm text-slate-500">Nenhuma bandeira cadastrada.</p>
+          <p className="px-5 py-6 text-sm text-slate-500">{t('cardBrands.empty')}</p>
         ) : (
           <div>{cardBrands.map((brand) => (
             <div key={brand.id} className="flex items-center gap-3 border-b border-slate-100 px-5 py-3 text-sm text-slate-700 last:border-b-0">
               <span className="min-w-0 flex-1 truncate">{brand.description}</span>
-              <div className="flex shrink-0 items-center gap-1">
+              <div className="flex w-[4.5rem] shrink-0 items-center justify-center gap-1">
                 <button
                   type="button"
                   onClick={() => openEditDialog(brand)}
-                  title="Editar bandeira"
-                  aria-label={`Editar ${brand.description}`}
+                  title={t('cardBrands.edit')}
+                  aria-label={t('cardBrands.editLabel', { description: brand.description })}
                   className="rounded-md p-1.5 text-slate-400 transition hover:bg-emerald-50 hover:text-emerald-600"
                 >
                   <Pencil size={13} />
@@ -169,8 +172,8 @@ export function CardBrands() {
                 <button
                   type="button"
                   onClick={() => setDeletingBrand(brand)}
-                  title="Excluir bandeira"
-                  aria-label={`Excluir ${brand.description}`}
+                  title={t('common.delete')}
+                  aria-label={t('cardBrands.deleteLabel', { description: brand.description })}
                   className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
                 >
                   <Trash2 size={13} />
@@ -184,17 +187,17 @@ export function CardBrands() {
       <Dialog open={!!deletingBrand} onOpenChange={(open) => { if (!open) setDeletingBrand(null); }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Excluir bandeira?</DialogTitle>
+            <DialogTitle>{t('cardBrands.deleteTitle')}</DialogTitle>
           </DialogHeader>
           <p className="text-sm text-slate-600">
-            Tem certeza que deseja excluir a bandeira <strong>{deletingBrand?.description}</strong>?
+            {t('cardBrands.deleteConfirmation', { description: deletingBrand?.description ?? '' })}
           </p>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDeletingBrand(null)}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="button" variant="destructive" onClick={handleDelete}>
-              Excluir
+              {t('common.delete')}
             </Button>
           </DialogFooter>
         </DialogContent>

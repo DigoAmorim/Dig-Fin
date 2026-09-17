@@ -1,0 +1,71 @@
+{
+  "common": {
+    "cancel": "Cancelar",
+    "save": "Salvar",
+    "delete": "Excluir",
+    "loading": "Carregando...",
+    "close": "Fechar",
+    "actions": "Ação"
+  },
+  "navigation": {
+    "overview": "Visão Geral",
+    "cardBrands": "Bandeira do Cartão",
+    "creditCards": "Cartão de Crédito"
+  },
+  "cardBrands": {
+    "section": "Bandeiras do Cartão",
+    "title": "Bandeiras do Cartão",
+    "listTitle": "Bandeiras",
+    "column": "Bandeiras",
+    "add": "Adicionar Bandeira",
+    "new": "Nova bandeira",
+    "edit": "Editar bandeira",
+    "description": "Descrição",
+    "descriptionPlaceholder": "Ex.: Visa",
+    "empty": "Nenhuma bandeira cadastrada.",
+    "deleteTitle": "Excluir bandeira?",
+    "deleteConfirmation": "Tem certeza que deseja excluir a bandeira {{description}}?",
+    "editLabel": "Editar {{description}}",
+    "deleteLabel": "Excluir {{description}}",
+    "loadError": "Não foi possível carregar as bandeiras.",
+    "createError": "Não foi possível salvar a bandeira.",
+    "updateError": "Não foi possível atualizar a bandeira.",
+    "deleteError": "Não foi possível excluir a bandeira.",
+    "duplicateError": "Já existe uma bandeira com essa descrição.",
+    "created": "Bandeira criada com sucesso.",
+    "updated": "Bandeira atualizada com sucesso.",
+    "deleted": "Bandeira excluída com sucesso."
+  },
+  "creditCards": {
+    "section": "Cartões de Crédito",
+    "title": "Cartões de Crédito",
+    "listTitle": "Cartões",
+    "columns": {
+      "card": "Cartão",
+      "brand": "Bandeira",
+      "dueDay": "Vencimento"
+    },
+    "add": "Adicionar Cartão",
+    "new": "Novo cartão de crédito",
+    "edit": "Editar cartão de crédito",
+    "name": "Nome do Cartão",
+    "namePlaceholder": "Ex.: Cartão principal",
+    "brand": "Bandeira do Cartão",
+    "brandPlaceholder": "Selecione uma bandeira",
+    "dueDay": "Dia de vencimento",
+    "dueDayPlaceholder": "Selecione o dia",
+    "dueDayValue": "Dia {{day}}",
+    "empty": "Nenhum cartão de crédito cadastrado.",
+    "deleteTitle": "Excluir cartão de crédito?",
+    "deleteConfirmation": "Tem certeza que deseja excluir o cartão {{name}}?",
+    "editLabel": "Editar {{name}}",
+    "deleteLabel": "Excluir {{name}}",
+    "loadError": "Não foi possível carregar os cartões de crédito.",
+    "createError": "Não foi possível salvar o cartão de crédito.",
+    "updateError": "Não foi possível atualizar o cartão de crédito.",
+    "deleteError": "Não foi possível excluir o cartão de crédito.",
+    "created": "Cartão de crédito criado com sucesso.",
+    "updated": "Cartão de crédito atualizado com sucesso.",
+    "deleted": "Cartão de crédito excluído com sucesso."
+  }
+}

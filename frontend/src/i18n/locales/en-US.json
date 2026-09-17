@@ -1,0 +1,71 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "close": "Close",
+    "actions": "Actions"
+  },
+  "navigation": {
+    "overview": "Overview",
+    "cardBrands": "Card Brand",
+    "creditCards": "Credit Card"
+  },
+  "cardBrands": {
+    "section": "Card Brands",
+    "title": "Card Brands",
+    "listTitle": "Card brands",
+    "column": "Card brands",
+    "add": "Add Card Brand",
+    "new": "New card brand",
+    "edit": "Edit card brand",
+    "description": "Description",
+    "descriptionPlaceholder": "E.g.: Visa",
+    "empty": "No card brands registered.",
+    "deleteTitle": "Delete card brand?",
+    "deleteConfirmation": "Are you sure you want to delete the card brand {{description}}?",
+    "editLabel": "Edit {{description}}",
+    "deleteLabel": "Delete {{description}}",
+    "loadError": "Could not load card brands.",
+    "createError": "Could not save the card brand.",
+    "updateError": "Could not update the card brand.",
+    "deleteError": "Could not delete the card brand.",
+    "duplicateError": "A card brand with this description already exists.",
+    "created": "Card brand created successfully.",
+    "updated": "Card brand updated successfully.",
+    "deleted": "Card brand deleted successfully."
+  },
+  "creditCards": {
+    "section": "Credit Cards",
+    "title": "Credit Cards",
+    "listTitle": "Cards",
+    "columns": {
+      "card": "Card",
+      "brand": "Brand",
+      "dueDay": "Due date"
+    },
+    "add": "Add Card",
+    "new": "New credit card",
+    "edit": "Edit credit card",
+    "name": "Card Name",
+    "namePlaceholder": "E.g.: Main card",
+    "brand": "Card Brand",
+    "brandPlaceholder": "Select a card brand",
+    "dueDay": "Due day",
+    "dueDayPlaceholder": "Select the day",
+    "dueDayValue": "Day {{day}}",
+    "empty": "No credit cards registered.",
+    "deleteTitle": "Delete credit card?",
+    "deleteConfirmation": "Are you sure you want to delete the card {{name}}?",
+    "editLabel": "Edit {{name}}",
+    "deleteLabel": "Delete {{name}}",
+    "loadError": "Could not load credit cards.",
+    "createError": "Could not save the credit card.",
+    "updateError": "Could not update the credit card.",
+    "deleteError": "Could not delete the credit card.",
+    "created": "Credit card created successfully.",
+    "updated": "Credit card updated successfully.",
+    "deleted": "Credit card deleted successfully."
+  }
+}

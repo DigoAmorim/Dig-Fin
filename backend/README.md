@@ -1,0 +1,28 @@
+# Backend
+
+API Node.js + Express + PostgreSQL do DigFin.
+
+## Configuração local
+
+1. Copie `.env.example` para `.env`.
+2. Preencha `DATABASE_URL` com as credenciais do seu PostgreSQL.
+3. Confirme que o schema `digfin` e a tabela `digfin.bandeira_cartao` existem.
+4. Execute `npm run dev`.
+
+O servidor inicia em `http://localhost:3000` por padrão. A porta e a origem do frontend podem ser alteradas no `.env`.
+
+Enquanto a autenticação ainda não foi implementada, `CONTA_ID` define a conta de desenvolvimento usada internamente pelo backend. O frontend não envia esse valor. Quando o login existir, o middleware de autenticação deverá substituir esse contexto pelo `conta_id` da sessão do usuário.
+
+## Endpoints
+
+- `GET /health`: verifica se a API está no ar.
+- `GET /api/bandeira-cartao`: lista as bandeiras.
+- `POST /api/bandeira-cartao`: cria uma bandeira com `{ "description": "Visa" }`.
+- `PUT /api/bandeira-cartao/:id`: atualiza uma bandeira.
+- `DELETE /api/bandeira-cartao/:id`: remove uma bandeira.
+- `GET /api/cartao-credito`: lista os cartões de crédito.
+- `POST /api/cartao-credito`: cria um cartão com `{ "name": "Cartão principal", "cardBrandId": "1", "dueDay": 10 }`.
+- `PUT /api/cartao-credito/:id`: atualiza um cartão.
+- `DELETE /api/cartao-credito/:id`: remove um cartão.
+
+O backend usa camadas de rotas, controllers, services e repositories. O repository é o único ponto que conhece os nomes de colunas do PostgreSQL (`descricao`); a API mantém o contrato `description` usado pelo frontend.
