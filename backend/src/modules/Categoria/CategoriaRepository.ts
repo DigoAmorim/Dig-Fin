@@ -1,5 +1,5 @@
 import type { QueryResultRow } from 'pg';
-import { pool } from '../../database/Pool';
+import { pool } from '../../../database/Pool';
 import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from './CategoriaTypes';
 
 interface CategoriaRow extends QueryResultRow {

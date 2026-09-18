@@ -4,14 +4,10 @@ import {
   Building2,
   ChevronDown,
   CreditCard,
-  GitBranch,
-  PieChart,
   ChevronRight,
   Search,
   Tags,
   Target,
-  TrendingUp,
-  Users,
   Wallet,
 } from 'lucide-react';
 
@@ -24,7 +20,6 @@ interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
   const [expandedSections, setExpandedSections] = useState({
     accounts: true,
-    analysis: true,
     settings: true,
   });
 
@@ -86,60 +81,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               Visão Geral
             </button>
 
-            <button
-              onClick={() => setActivePage('transactions')}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
-                activePage === 'transactions'
-                  ? 'bg-emerald-50 text-emerald-700 font-medium'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <Wallet className="w-4 h-4" />
-              Transações
-            </button>
           </nav>}
         </div>
 
-        {/* Seção 2: ANALYSIS */}
-        <div>
-          <button
-            type="button"
-            onClick={() => toggleSection('analysis')}
-            aria-expanded={expandedSections.analysis}
-            className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2 hover:text-slate-600 transition cursor-pointer"
-          >
-            Analysis
-            <ChevronRight
-              className={`w-3.5 h-3.5 transition-transform ${expandedSections.analysis ? 'rotate-90' : ''}`}
-            />
-          </button>
-          {expandedSections.analysis && <nav className="space-y-0.5 text-sm">
-            <button 
-              onClick={() => setActivePage('reports')}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
-                activePage === 'reports'
-                  ? 'bg-emerald-50 text-emerald-700 font-medium'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <PieChart className="w-4 h-4" />
-              Reports
-            </button>
-            <button 
-              onClick={() => setActivePage('assets')}
-              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
-                activePage === 'assets'
-                  ? 'bg-emerald-50 text-emerald-700 font-medium'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <TrendingUp className="w-4 h-4" />
-              Assets
-            </button>
-          </nav>}
-        </div>
-
-        {/* Seção 3: SETUP */}
+        {/* Seção 2: SETUP */}
         <div>
           <button
             type="button"
@@ -174,6 +119,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             >
               <CreditCard className="w-4 h-4" />
               Cartão de Crédito
+            </button>            
+            <button
+              onClick={() => setActivePage('bank-institutions')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'bank-institutions'
+                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              Instituição Bancária
+            </button>
+            <button
+              onClick={() => setActivePage('bank-accounts')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'bank-accounts'
+                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Wallet className="w-4 h-4" />
+              Conta Bancária
             </button>
             <button
               onClick={() => setActivePage('categories')}
@@ -186,32 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               <Tags className="w-4 h-4" />
               Categorias
             </button>
-            <button className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer">
-              <Users className="w-4 h-4" />
-              Payees
-            </button>
-            <button className="w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition cursor-pointer">
-              <GitBranch className="w-4 h-4" />
-              Rules
-            </button>
           </nav>}
-        </div>
-
-        {/* Resumo de Contas Rápidas */}
-        <div className="pt-2 border-t border-slate-100">
-          <h3 className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2">
-            Contas Ativas
-          </h3>
-          <div className="space-y-1 text-xs">
-            <div className="flex justify-between items-center px-2 py-1 text-slate-700">
-              <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5 text-blue-500"/> Nubank</span>
-              <span className="font-mono text-emerald-600 font-medium">R$ 28.003,87</span>
-            </div>
-            <div className="flex justify-between items-center px-2 py-1 text-slate-700">
-              <span className="flex items-center gap-1.5"><CreditCard className="w-3.5 h-3.5 text-purple-500"/> Cartão Crédito</span>
-              <span className="font-mono text-rose-600 font-medium">-R$ 5.579,07</span>
-            </div>
-          </div>
         </div>
       </div>
 

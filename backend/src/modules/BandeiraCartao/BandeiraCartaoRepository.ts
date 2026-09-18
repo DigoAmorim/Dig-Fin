@@ -1,5 +1,5 @@
 import type { QueryResultRow } from 'pg';
-import { pool } from '../../database/Pool';
+import { pool } from '../../../database/Pool';
 import type { BandeiraCartao, BandeiraCartaoInput } from './BandeiraCartaoTypes';
 
 interface BandeiraCartaoRow extends QueryResultRow {

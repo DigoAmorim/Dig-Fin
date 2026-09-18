@@ -1,5 +1,5 @@
 import type { QueryResultRow } from 'pg';
-import { pool } from '../../database/Pool';
+import { pool } from '../../../database/Pool';
 import type { CartaoCredito, CartaoCreditoInput } from './CartaoCreditoTypes';
 
 interface CartaoCreditoRow extends QueryResultRow {

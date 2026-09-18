@@ -7,7 +7,16 @@ API Node.js + Express + PostgreSQL do DigFin.
 1. Copie `.env.example` para `.env`.
 2. Preencha `DATABASE_URL` com as credenciais do seu PostgreSQL.
 3. Confirme que o schema `digfin` e a tabela `digfin.bandeira_cartao` existem.
-4. Execute `npm run dev`.
+4. Execute `npm run migrate` para aplicar as migrations pendentes.
+5. Execute `npm run dev`.
+
+## Manutenção do banco
+
+O arquivo `database/schema.sql` é o bootstrap para uma instalação nova. Depois que o banco estiver criado, alterações estruturais devem ser feitas em novos arquivos numerados em `database/migrations/`, nunca editando uma migration já aplicada. A conexão compartilhada com o banco fica em `database/Pool.ts`.
+
+O comando `npm run migrate` executa os arquivos pendentes em ordem lexicográfica e registra cada arquivo em `digfin.schema_migrations`. A primeira migration atual reforça o isolamento por `conta_id` nas referências de cartões e contas bancárias.
+
+Antes de adicionar tabelas de transações, mantenha o mesmo padrão: `conta_id` obrigatório, chaves estrangeiras compostas quando a relação cruzar entidades da conta, índices para filtros e joins frequentes, e regras de exclusão explícitas.
 
 O servidor inicia em `http://localhost:3000` por padrão. A porta e a origem do frontend podem ser alteradas no `.env`.
 

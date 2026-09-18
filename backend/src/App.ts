@@ -3,6 +3,8 @@ import type { Request, Response } from 'express';
 import { env } from './config/Env';
 import { errorHandler } from './shared/middleware/ErrorHandler';
 import { bandeiraCartaoRoutes } from './modules/BandeiraCartao/BandeiraCartaoRoutes';
+import { instituicaoBancariaRoutes } from './modules/InstituicaoBancaria/InstituicaoBancariaRoutes';
+import { contaBancariaRoutes } from './modules/ContaBancaria/ContaBancariaRoutes';
 import { cartaoCreditoRoutes } from './modules/CartaoCredito/CartaoCreditoRoutes';
 import { categoriaRoutes } from './modules/Categoria/CategoriaRoutes';
 
@@ -25,6 +27,8 @@ app.get('/health', (_request: Request, response: Response) => {
 });
 
 app.use('/api/bandeira-cartao', bandeiraCartaoRoutes);
+app.use('/api/instituicao-bancaria', instituicaoBancariaRoutes);
+app.use('/api/conta-bancaria', contaBancariaRoutes);
 app.use('/api/cartao-credito', cartaoCreditoRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use(errorHandler);

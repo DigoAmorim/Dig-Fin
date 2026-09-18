@@ -40,6 +40,9 @@ CREATE TABLE digfin.bandeira_cartao (
     CONSTRAINT pk_bandeira_cartao
         PRIMARY KEY (id),
 
+    CONSTRAINT uk_bandeira_cartao_id_conta
+        UNIQUE (id, conta_id),
+
     CONSTRAINT fk_bandeira_cartao_conta
         FOREIGN KEY (conta_id)
         REFERENCES digfin.conta(id)
@@ -48,6 +51,56 @@ CREATE TABLE digfin.bandeira_cartao (
 
 CREATE UNIQUE INDEX uk_bandeira_cartao_conta_descricao
 ON digfin.bandeira_cartao (conta_id, LOWER(descricao));
+
+CREATE TABLE digfin.instituicao_bancaria (
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    conta_id UUID NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT pk_instituicao_bancaria
+        PRIMARY KEY (id),
+
+    CONSTRAINT uk_instituicao_bancaria_id_conta
+        UNIQUE (id, conta_id),
+
+    CONSTRAINT fk_instituicao_bancaria_conta
+        FOREIGN KEY (conta_id)
+        REFERENCES digfin.conta(id)
+        ON DELETE CASCADE
+);
+
+CREATE UNIQUE INDEX uk_instituicao_bancaria_conta_nome
+ON digfin.instituicao_bancaria (conta_id, LOWER(nome));
+
+CREATE TABLE digfin.conta_bancaria (
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    conta_id UUID NOT NULL,
+    nome VARCHAR(100) NOT NULL,
+    instituicao_bancaria_id BIGINT NOT NULL,
+    criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT pk_conta_bancaria
+        PRIMARY KEY (id),
+
+    CONSTRAINT fk_conta_bancaria_conta
+        FOREIGN KEY (conta_id)
+        REFERENCES digfin.conta(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_conta_bancaria_instituicao
+        FOREIGN KEY (instituicao_bancaria_id, conta_id)
+        REFERENCES digfin.instituicao_bancaria(id, conta_id)
+        ON DELETE NO ACTION
+);
+
+CREATE UNIQUE INDEX uk_conta_bancaria_conta_nome
+ON digfin.conta_bancaria (conta_id, LOWER(nome));
+
+CREATE INDEX ix_conta_bancaria_conta_instituicao
+ON digfin.conta_bancaria (conta_id, instituicao_bancaria_id);
 
 CREATE TABLE digfin.categoria (
     id BIGINT GENERATED ALWAYS AS IDENTITY,
@@ -129,12 +182,16 @@ CREATE TABLE digfin.cartao_credito (
         ON DELETE CASCADE,
 
     CONSTRAINT fk_cartao_credito_bandeira
-        FOREIGN KEY (bandeira_cartao_id)
-        REFERENCES digfin.bandeira_cartao(id),
+        FOREIGN KEY (bandeira_cartao_id, conta_id)
+        REFERENCES digfin.bandeira_cartao(id, conta_id)
+        ON DELETE NO ACTION,
 
     CONSTRAINT ck_cartao_credito_dia_vencimento
         CHECK (dia_vencimento BETWEEN 1 AND 31)
 );
+
+CREATE INDEX ix_cartao_credito_conta_bandeira
+ON digfin.cartao_credito (conta_id, bandeira_cartao_id);
 
 INSERT INTO digfin.conta (id, nome)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Conta de Desenvolvimento')
