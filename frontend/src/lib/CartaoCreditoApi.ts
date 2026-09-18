@@ -1,11 +1,17 @@
 import axios from 'axios';
 import type { CartaoCredito, CartaoCreditoInput } from '../types/CartaoCredito.ts';
+import i18n from '../i18n/config';
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/api`,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+api.interceptors.request.use((config) => {
+  config.headers.set('Accept-Language', i18n.language);
+  return config;
 });
 
 interface ApiErrorResponse {

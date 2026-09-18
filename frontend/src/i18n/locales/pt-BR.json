@@ -31,6 +31,7 @@
     "createError": "Não foi possível salvar a bandeira.",
     "updateError": "Não foi possível atualizar a bandeira.",
     "deleteError": "Não foi possível excluir a bandeira.",
+    "deleteInUseError": "Não é possível excluir esta bandeira porque ela está sendo utilizada por um cartão de crédito.",
     "duplicateError": "Já existe uma bandeira com essa descrição.",
     "created": "Bandeira criada com sucesso.",
     "updated": "Bandeira atualizada com sucesso.",

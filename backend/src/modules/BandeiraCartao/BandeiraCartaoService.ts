@@ -25,7 +25,7 @@ export class BandeiraCartaoService {
         try {
             const bandeiraCartao = await this.repository.update(id, { description });
             if (!bandeiraCartao) {
-                throw new ErroAplicacao(404, 'Bandeira não encontrada.');
+                throw new ErroAplicacao(404, 'cardBrandNotFound');
             }
             return bandeiraCartao;
         } catch (error) {
@@ -35,25 +35,32 @@ export class BandeiraCartaoService {
     }
 
     async delete(id: number): Promise<void> {
-        const deleted = await this.repository.delete(id);
-        if (!deleted) {
-            throw new ErroAplicacao(404, 'Bandeira não encontrada.');
+        try {
+            const deleted = await this.repository.delete(id);
+            if (!deleted) {
+                throw new ErroAplicacao(404, 'cardBrandNotFound');
+            }
+        } catch (error) {
+            if (isPostgresError(error) && error.code === '23503') {
+                throw new ErroAplicacao(409, 'cardBrandInUse');
+            }
+            throw error;
         }
     }
 
     private validateDescription(description: unknown): string {
         if (typeof description !== 'string' || !description.trim()) {
-            throw new ErroAplicacao(400, 'A descrição é obrigatória.');
+            throw new ErroAplicacao(400, 'cardBrandDescriptionRequired');
         }
         if (description.trim().length > 50) {
-            throw new ErroAplicacao(400, 'A descrição deve ter no máximo 50 caracteres.');
+            throw new ErroAplicacao(400, 'cardBrandDescriptionTooLong');
         }
         return description.trim();
     }
 
     private throwConstraintError(error: unknown): void {
         if (isPostgresError(error) && error.code === '23505') {
-            throw new ErroAplicacao(409, 'Já existe uma bandeira com essa descrição.');
+            throw new ErroAplicacao(409, 'cardBrandDescriptionDuplicate');
         }
     }
 }

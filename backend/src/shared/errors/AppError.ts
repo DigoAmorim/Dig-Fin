@@ -1,9 +1,9 @@
 export class ErroAplicacao extends Error {
     constructor(
         public readonly statusCode: number,
-        message: string,
+        public readonly messageKey: string,
     ) {
-        super(message);
+        super(messageKey);
         this.name = 'ErroAplicacao';
     }
 }

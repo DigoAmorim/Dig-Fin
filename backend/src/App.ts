@@ -10,7 +10,7 @@ export const app = express();
 app.use(express.json());
 app.use((_request, response, next) => {
     response.header('Access-Control-Allow-Origin', env.corsOrigin);
-    response.header('Access-Control-Allow-Headers', 'Content-Type');
+    response.header('Access-Control-Allow-Headers', 'Content-Type, Accept-Language');
     response.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
     if (_request.method === 'OPTIONS') {
         response.sendStatus(204);

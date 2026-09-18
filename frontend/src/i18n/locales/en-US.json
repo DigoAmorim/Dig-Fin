@@ -31,6 +31,7 @@
     "createError": "Could not save the card brand.",
     "updateError": "Could not update the card brand.",
     "deleteError": "Could not delete the card brand.",
+    "deleteInUseError": "This card brand cannot be deleted because it is being used by a credit card.",
     "duplicateError": "A card brand with this description already exists.",
     "created": "Card brand created successfully.",
     "updated": "Card brand updated successfully.",

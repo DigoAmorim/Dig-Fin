@@ -41,7 +41,7 @@ export class BandeiraCartaoController {
     private getId(request: Request): number {
         const id = Number(request.params.id);
         if (!Number.isSafeInteger(id) || id <= 0) {
-            throw new ErroAplicacao(400, 'ID inválido.');
+            throw new ErroAplicacao(400, 'invalidId');
         }
         return id;
     }

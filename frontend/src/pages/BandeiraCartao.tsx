@@ -83,7 +83,11 @@ export function CardBrands() {
       setDeletingBrand(null);
       setError('');
       toast.success(t('cardBrands.deleted'));
-    } catch {
+    } catch (deletionError) {
+      if (deletionError instanceof BandeiraCartaoApiError && deletionError.statusCode === 409) {
+        toast.error(t('cardBrands.deleteInUseError'));
+        return;
+      }
       toast.error(t('cardBrands.deleteError'));
     }
   };
@@ -158,7 +162,7 @@ export function CardBrands() {
         ) : (
           <div>{cardBrands.map((brand) => (
             <div key={brand.id} className="flex items-center gap-3 border-b border-slate-100 px-5 py-3 text-sm text-slate-700 last:border-b-0">
-              <span className="min-w-0 flex-1 truncate">{brand.description}</span>
+              <span className="min-w-0 flex-1 truncate font-medium">{brand.description}</span>
               <div className="flex w-[4.5rem] shrink-0 items-center justify-center gap-1">
                 <button
                   type="button"

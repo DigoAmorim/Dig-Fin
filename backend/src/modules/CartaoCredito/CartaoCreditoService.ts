@@ -14,7 +14,7 @@ export class CartaoCreditoService {
         const validatedInput = this.validateInput(input);
         const card = await this.repository.create(validatedInput);
         if (!card) {
-            throw new ErroAplicacao(404, 'A bandeira selecionada não foi encontrada.');
+            throw new ErroAplicacao(404, 'selectedCardBrandNotFound');
         }
         return card;
     }
@@ -23,7 +23,7 @@ export class CartaoCreditoService {
         const validatedInput = this.validateInput(input);
         const card = await this.repository.update(id, validatedInput);
         if (!card) {
-            throw new ErroAplicacao(404, 'Cartão de crédito ou bandeira não encontrada.');
+            throw new ErroAplicacao(404, 'creditCardOrBrandNotFound');
         }
         return card;
     }
@@ -31,22 +31,22 @@ export class CartaoCreditoService {
     async delete(id: string): Promise<void> {
         const deleted = await this.repository.delete(id);
         if (!deleted) {
-            throw new ErroAplicacao(404, 'Cartão de crédito não encontrado.');
+            throw new ErroAplicacao(404, 'creditCardNotFound');
         }
     }
 
     private validateInput(input: CartaoCreditoInput): CartaoCreditoInput {
         if (typeof input?.name !== 'string' || !input.name.trim()) {
-            throw new ErroAplicacao(400, 'O nome do cartão é obrigatório.');
+            throw new ErroAplicacao(400, 'creditCardNameRequired');
         }
         if (input.name.trim().length > 50) {
-            throw new ErroAplicacao(400, 'O nome do cartão deve ter no máximo 50 caracteres.');
+            throw new ErroAplicacao(400, 'creditCardNameTooLong');
         }
         if (typeof input?.cardBrandId !== 'string' || !input.cardBrandId.trim()) {
-            throw new ErroAplicacao(400, 'A bandeira do cartão é obrigatória.');
+            throw new ErroAplicacao(400, 'creditCardBrandRequired');
         }
         if (!Number.isInteger(input.dueDay) || input.dueDay < 1 || input.dueDay > 31) {
-            throw new ErroAplicacao(400, 'O dia de vencimento deve estar entre 1 e 31.');
+            throw new ErroAplicacao(400, 'creditCardDueDayInvalid');
         }
         return {
             name: input.name.trim(),

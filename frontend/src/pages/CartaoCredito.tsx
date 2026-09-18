@@ -10,6 +10,13 @@ import { Button } from '../components/ui/Button.tsx';
 import { Input } from '../components/ui/Input.tsx';
 import { Label } from '../components/ui/Label.tsx';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../components/ui/Select.tsx';
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -140,31 +147,35 @@ export function CreditCards() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="credit-card-brand" required>{t('creditCards.brand')}</Label>
-              <select
-                id="credit-card-brand"
-                value={cardBrandId}
-                onChange={(event) => setCardBrandId(event.target.value)}
+              <Select
+                value={cardBrandId || undefined}
+                onValueChange={setCardBrandId}
                 required
-                className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
               >
-                <option value="">{t('creditCards.brandPlaceholder')}</option>
-                {brands.map((brand) => (
-                  <option key={brand.id} value={String(brand.id)}>{brand.description}</option>
-                ))}
-              </select>
+                <SelectTrigger id="credit-card-brand" aria-invalid={Boolean(formError)}>
+                  <SelectValue placeholder={t('creditCards.brandPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {brands.map((brand) => (
+                    <SelectItem key={brand.id} value={String(brand.id)}>{brand.description}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-2">
               <Label htmlFor="credit-card-due-day" required>{t('creditCards.dueDay')}</Label>
-              <select
-                id="credit-card-due-day"
-                value={dueDay}
-                onChange={(event) => setDueDay(event.target.value)}
+              <Select
+                value={dueDay || undefined}
+                onValueChange={setDueDay}
                 required
-                className="h-9 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
               >
-                <option value="">{t('creditCards.dueDayPlaceholder')}</option>
-                {dueDays.map((day) => <option key={day} value={day}>{day}</option>)}
-              </select>
+                <SelectTrigger id="credit-card-due-day" aria-invalid={Boolean(formError)}>
+                  <SelectValue placeholder={t('creditCards.dueDayPlaceholder')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {dueDays.map((day) => <SelectItem key={day} value={String(day)}>{day}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
             <DialogFooter>

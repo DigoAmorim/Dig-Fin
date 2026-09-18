@@ -41,7 +41,7 @@ export class CartaoCreditoController {
     private getId(request: Request): string {
         const id = request.params.id;
         if (typeof id !== 'string' || !/^\d+$/.test(id)) {
-            throw new ErroAplicacao(400, 'ID inválido.');
+            throw new ErroAplicacao(400, 'invalidId');
         }
         return id;
     }
