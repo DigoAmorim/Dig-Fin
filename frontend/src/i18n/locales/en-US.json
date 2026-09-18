@@ -3,14 +3,46 @@
     "cancel": "Cancel",
     "save": "Save",
     "delete": "Delete",
+    "required": "This field is required.",
     "loading": "Loading...",
     "close": "Close",
-    "actions": "Actions"
+    "actions": "Actions",
+    "searchIcon": "Search icon...",
+    "noIconsFound": "No icons found."
   },
   "navigation": {
     "overview": "Overview",
     "cardBrands": "Card Brand",
-    "creditCards": "Credit Card"
+    "creditCards": "Credit Card",
+    "categories": "Categories"
+  },
+  "errors": {
+    "invalidId": "Invalid ID.",
+    "cardBrandNotFound": "Card brand not found.",
+    "cardBrandInUse": "This card brand cannot be deleted because it is being used by a credit card.",
+    "cardBrandDescriptionRequired": "Description is required.",
+    "cardBrandDescriptionTooLong": "Description must be at most 50 characters long.",
+    "cardBrandDescriptionDuplicate": "A card brand with this description already exists.",
+    "selectedCardBrandNotFound": "The selected card brand was not found.",
+    "creditCardOrBrandNotFound": "Credit card or card brand not found.",
+    "creditCardNotFound": "Credit card not found.",
+    "creditCardNameRequired": "Card name is required.",
+    "creditCardNameTooLong": "Card name must be at most 50 characters long.",
+    "creditCardBrandRequired": "Card brand is required.",
+    "creditCardDueDayInvalid": "Due day must be between 1 and 31.",
+    "categoryNotFound": "Category not found.",
+    "categoryInUse": "The category cannot be deleted while it has subcategories.",
+    "categoryNameRequired": "Category name is required.",
+    "categoryNameTooLong": "Category name must be at most 100 characters long.",
+    "categoryNameDuplicate": "A category with this name already exists.",
+    "categoryColorInvalid": "The category color is invalid.",
+    "categoryIconInvalid": "The category icon is invalid.",
+    "categoryIdInvalid": "The selected category is invalid.",
+    "subcategoryNotFound": "Subcategory not found.",
+    "subcategoryNameRequired": "Subcategory name is required.",
+    "subcategoryNameTooLong": "Subcategory name must be at most 100 characters long.",
+    "subcategoryNameDuplicate": "A subcategory with this name already exists.",
+    "internal": "Internal server error."
   },
   "cardBrands": {
     "section": "Card Brands",
@@ -68,5 +100,38 @@
     "created": "Credit card created successfully.",
     "updated": "Credit card updated successfully.",
     "deleted": "Credit card deleted successfully."
+  },
+  "categories": {
+    "section": "Categories",
+    "title": "Categories",
+    "listTitle": "Categories and subcategories",
+    "description": "Organize your transactions into categories and subcategories.",
+    "add": "Add category",
+    "new": "New category",
+    "edit": "Edit category",
+    "name": "Category name",
+    "color": "Color",
+    "icon": "Icon",
+    "empty": "No categories registered.",
+    "created": "Category created successfully.",
+    "updated": "Category updated successfully.",
+    "deleted": "Category deleted successfully.",
+    "deleteTitle": "Delete category?",
+    "deleteConfirmation": "Are you sure you want to delete the category {{name}}?"
+  },
+  "subcategories": {
+    "add": "Add subcategory",
+    "new": "New subcategory",
+    "edit": "Edit subcategory",
+    "name": "Subcategory name",
+    "category": "Category",
+    "color": "Color",
+    "icon": "Icon",
+    "noCategory": "No category",
+    "created": "Subcategory created successfully.",
+    "updated": "Subcategory updated successfully.",
+    "deleted": "Subcategory deleted successfully.",
+    "deleteTitle": "Delete subcategory?",
+    "deleteConfirmation": "Are you sure you want to delete the subcategory {{name}}?"
   }
 }

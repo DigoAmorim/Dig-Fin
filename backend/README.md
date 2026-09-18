@@ -24,5 +24,25 @@ Enquanto a autenticação ainda não foi implementada, `CONTA_ID` define a conta
 - `POST /api/cartao-credito`: cria um cartão com `{ "name": "Cartão principal", "cardBrandId": "1", "dueDay": 10 }`.
 - `PUT /api/cartao-credito/:id`: atualiza um cartão.
 - `DELETE /api/cartao-credito/:id`: remove um cartão.
+- `GET /api/categorias`: lista categorias e subcategorias da conta.
+- `POST /api/categorias`: cria uma categoria.
+- `PUT /api/categorias/:id`: atualiza uma categoria.
+- `DELETE /api/categorias/:id`: remove uma categoria sem subcategorias.
+- `POST /api/categorias/subcategorias`: cria uma subcategoria, com `categoryId` opcional.
+- `PUT /api/categorias/subcategorias/:id`: atualiza uma subcategoria.
+- `DELETE /api/categorias/subcategorias/:id`: remove uma subcategoria.
 
 O backend usa camadas de rotas, controllers, services e repositories. O repository é o único ponto que conhece os nomes de colunas do PostgreSQL (`descricao`); a API mantém o contrato `description` usado pelo frontend.
+
+## Contrato de erros
+
+Erros de aplicação retornam um código estável e parâmetros opcionais. O frontend deve traduzir o código localmente:
+
+```json
+{
+	"code": "cardBrandDescriptionDuplicate",
+	"params": {}
+}
+```
+
+Clientes que não conseguem traduzir códigos podem solicitar uma mensagem localizada enviando `Prefer: localized-error-message` e `Accept-Language`. Nesse caso, a resposta também inclui `message`; ela é uma capacidade de compatibilidade e não deve ser usada como identificador do erro.

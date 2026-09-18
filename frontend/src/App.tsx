@@ -4,6 +4,7 @@ import { Layout } from './components/Layout';
 import { Dashboard } from './pages/Dashboard';
 import { CardBrands } from './pages/BandeiraCartao';
 import { CreditCards } from './pages/CartaoCredito';
+import { Categories } from './pages/Categorias';
 import { Toaster } from './components/ui/Sonner';
 // import { Transactions } from './pages/Transactions'; // Uma tela futura
 
@@ -15,7 +16,7 @@ function App() {
   return (
     <>
       <Layout
-        title={activePage === 'dashboard' ? t('navigation.overview') : activePage === 'card-brands' ? t('navigation.cardBrands') : activePage === 'credit-cards' ? t('navigation.creditCards') : activePage}
+        title={activePage === 'dashboard' ? t('navigation.overview') : activePage === 'card-brands' ? t('navigation.cardBrands') : activePage === 'credit-cards' ? t('navigation.creditCards') : activePage === 'categories' ? t('navigation.categories') : activePage}
         activePage={activePage}
         setActivePage={setActivePage}
       >
@@ -23,6 +24,7 @@ function App() {
         {activePage === 'dashboard' && <Dashboard />}
         {activePage === 'card-brands' && <CardBrands />}
         {activePage === 'credit-cards' && <CreditCards />}
+        {activePage === 'categories' && <Categories />}
 
         {/* Exemplo de como seria para mostrar outra tela: */}
         {/* {activePage === 'transactions' && <Transactions />} */}

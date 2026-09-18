@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { CartaoCredito, CartaoCreditoInput } from '../types/CartaoCredito.ts';
 import i18n from '../i18n/config';
+import { ApiError, type ApiErrorResponse } from './ApiError.ts';
 
 const api = axios.create({
   baseURL: `${import.meta.env.VITE_API_URL ?? 'http://localhost:3000'}/api`,
@@ -14,32 +15,22 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-interface ApiErrorResponse {
-  message?: string;
-}
-
-export class CartaoCreditoApiError extends Error {
-  readonly statusCode?: number;
-
-  constructor(message: string, statusCode?: number) {
-    super(message);
-    this.name = 'CartaoCreditoApiError';
-    this.statusCode = statusCode;
-  }
-}
+export class CartaoCreditoApiError extends ApiError {}
 
 async function request<T>(requestCallback: () => Promise<{ data: T }>): Promise<T> {
   try {
     const { data } = await requestCallback();
     return data;
   } catch (error) {
-    let message = 'Não foi possível concluir a operação.';
+    let code = 'internal';
     let statusCode: number | undefined;
+    let params: Record<string, unknown> = {};
     if (axios.isAxiosError<ApiErrorResponse>(error)) {
       statusCode = error.response?.status;
-      message = error.response?.data?.message ?? message;
+      code = error.response?.data?.code ?? code;
+      params = error.response?.data?.params ?? params;
     }
-    throw new CartaoCreditoApiError(message, statusCode);
+    throw new CartaoCreditoApiError(code, statusCode, params);
   }
 }
 

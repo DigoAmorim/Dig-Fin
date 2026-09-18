@@ -1,9 +1,10 @@
 export class ErroAplicacao extends Error {
     constructor(
         public readonly statusCode: number,
-        public readonly messageKey: string,
+        public readonly code: string,
+        public readonly params: Record<string, unknown> = {},
     ) {
-        super(messageKey);
+        super(code);
         this.name = 'ErroAplicacao';
     }
 }

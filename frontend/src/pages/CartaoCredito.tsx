@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cartaoCreditoApi, CartaoCreditoApiError } from '../lib/CartaoCreditoApi.ts';
+import { translateApiError } from '../lib/ApiError.ts';
 import { bandeiraCartaoApi } from '../lib/BandeiraCartaoApi.ts';
 import type { CartaoCredito } from '../types/CartaoCredito.ts';
 import type { BandeiraCartao } from '../types/BandeiraCartao.ts';
@@ -81,11 +82,11 @@ export function CreditCards() {
       resetForm();
       toast.success(editingCard ? t('creditCards.updated') : t('creditCards.created'));
     } catch (submissionError) {
-      if (submissionError instanceof CartaoCreditoApiError && submissionError.statusCode === 400) {
-        setFormError(submissionError.message);
+      if (submissionError instanceof CartaoCreditoApiError) {
+        setFormError(translateApiError(submissionError));
         return;
       }
-      setFormError(editingCard ? t('creditCards.updateError') : t('creditCards.createError'));
+      setFormError(translateApiError(submissionError));
     }
   };
 
@@ -111,8 +112,8 @@ export function CreditCards() {
       setCards((current) => current.filter((card) => card.id !== deletingCard.id));
       setDeletingCard(null);
       toast.success(t('creditCards.deleted'));
-    } catch {
-      toast.error(t('creditCards.deleteError'));
+    } catch (deletionError) {
+      toast.error(translateApiError(deletionError));
     }
   };
 
@@ -131,7 +132,12 @@ export function CreditCards() {
           <DialogHeader>
             <DialogTitle>{editingCard ? t('creditCards.edit') : t('creditCards.new')}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            onInvalid={(event) => (event.target as HTMLInputElement).setCustomValidity(t('common.required'))}
+            onInput={(event) => (event.target as HTMLInputElement).setCustomValidity('')}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="credit-card-name" required>{t('creditCards.name')}</Label>
               <Input
@@ -148,6 +154,7 @@ export function CreditCards() {
             <div className="space-y-2">
               <Label htmlFor="credit-card-brand" required>{t('creditCards.brand')}</Label>
               <Select
+                name="cardBrandId"
                 value={cardBrandId || undefined}
                 onValueChange={setCardBrandId}
                 required
@@ -165,6 +172,7 @@ export function CreditCards() {
             <div className="space-y-2">
               <Label htmlFor="credit-card-due-day" required>{t('creditCards.dueDay')}</Label>
               <Select
+                name="dueDay"
                 value={dueDay || undefined}
                 onValueChange={setDueDay}
                 required
@@ -189,7 +197,10 @@ export function CreditCards() {
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-end gap-3 border-b border-slate-200 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+          <div>
+            <p className="mt-1 text-xs text-slate-500">{t('creditCards.listTitle')}</p>
+          </div>
           <Button type="button" onClick={openCreateDialog} size="sm" className="gap-1.5">
             <Plus size={13} /> {t('creditCards.add')}
           </Button>

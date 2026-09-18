@@ -21,6 +21,18 @@ void i18n.init({
                     creditCardNameTooLong: 'O nome do cartão deve ter no máximo 50 caracteres.',
                     creditCardBrandRequired: 'A bandeira do cartão é obrigatória.',
                     creditCardDueDayInvalid: 'O dia de vencimento deve estar entre 1 e 31.',
+                    categoryNotFound: 'Categoria não encontrada.',
+                    categoryInUse: 'A categoria não pode ser excluída enquanto possuir subcategorias.',
+                    categoryNameRequired: 'O nome da categoria é obrigatório.',
+                    categoryNameTooLong: 'O nome da categoria deve ter no máximo 100 caracteres.',
+                    categoryNameDuplicate: 'Já existe uma categoria com esse nome.',
+                    categoryColorInvalid: 'A cor da categoria é inválida.',
+                    categoryIconInvalid: 'O ícone da categoria é inválido.',
+                    categoryIdInvalid: 'A categoria selecionada é inválida.',
+                    subcategoryNotFound: 'Subcategoria não encontrada.',
+                    subcategoryNameRequired: 'O nome da subcategoria é obrigatório.',
+                    subcategoryNameTooLong: 'O nome da subcategoria deve ter no máximo 100 caracteres.',
+                    subcategoryNameDuplicate: 'Já existe uma subcategoria com esse nome.',
                     internal: 'Erro interno do servidor.',
                 },
             },
@@ -41,6 +53,18 @@ void i18n.init({
                     creditCardNameTooLong: 'Card name must be at most 50 characters long.',
                     creditCardBrandRequired: 'Card brand is required.',
                     creditCardDueDayInvalid: 'Due day must be between 1 and 31.',
+                    categoryNotFound: 'Category not found.',
+                    categoryInUse: 'The category cannot be deleted while it has subcategories.',
+                    categoryNameRequired: 'Category name is required.',
+                    categoryNameTooLong: 'Category name must be at most 100 characters long.',
+                    categoryNameDuplicate: 'A category with this name already exists.',
+                    categoryColorInvalid: 'The category color is invalid.',
+                    categoryIconInvalid: 'The category icon is invalid.',
+                    categoryIdInvalid: 'The selected category is invalid.',
+                    subcategoryNotFound: 'Subcategory not found.',
+                    subcategoryNameRequired: 'Subcategory name is required.',
+                    subcategoryNameTooLong: 'Subcategory name must be at most 100 characters long.',
+                    subcategoryNameDuplicate: 'A subcategory with this name already exists.',
                     internal: 'Internal server error.',
                 },
             },
@@ -55,6 +79,10 @@ export const getLanguageFromHeader = (acceptLanguage?: string): SupportedLanguag
     return requestedLanguage?.startsWith('en') ? 'en-US' : 'pt-BR';
 };
 
-export const translate = (key: string, language: SupportedLanguage): string => (
-    i18n.t(key, { lng: language })
+export const translate = (
+    key: string,
+    language: SupportedLanguage,
+    params: Record<string, unknown> = {},
+): string => (
+    i18n.t(key, { lng: language, ...params })
 );

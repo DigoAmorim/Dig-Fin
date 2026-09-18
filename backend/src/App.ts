@@ -4,6 +4,7 @@ import { env } from './config/Env';
 import { errorHandler } from './shared/middleware/ErrorHandler';
 import { bandeiraCartaoRoutes } from './modules/BandeiraCartao/BandeiraCartaoRoutes';
 import { cartaoCreditoRoutes } from './modules/CartaoCredito/CartaoCreditoRoutes';
+import { categoriaRoutes } from './modules/Categoria/CategoriaRoutes';
 
 export const app = express();
 
@@ -25,4 +26,5 @@ app.get('/health', (_request: Request, response: Response) => {
 
 app.use('/api/bandeira-cartao', bandeiraCartaoRoutes);
 app.use('/api/cartao-credito', cartaoCreditoRoutes);
+app.use('/api/categorias', categoriaRoutes);
 app.use(errorHandler);

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { BandeiraCartaoApiError, bandeiraCartaoApi } from '../lib/BandeiraCartaoApi.ts';
+import { translateApiError } from '../lib/ApiError.ts';
 import type { BandeiraCartao } from '../types/BandeiraCartao.ts';
 import { Button } from '../components/ui/Button.tsx';
 import { Input } from '../components/ui/Input.tsx';
@@ -52,11 +53,11 @@ export function CardBrands() {
       setEditingBrand(null);
       toast.success(editingBrand ? t('cardBrands.updated') : t('cardBrands.created'));
     } catch (submissionError) {
-      if (submissionError instanceof BandeiraCartaoApiError && submissionError.statusCode === 409) {
-        setFormError(t('cardBrands.duplicateError'));
+      if (submissionError instanceof BandeiraCartaoApiError) {
+        setFormError(translateApiError(submissionError));
         return;
       }
-      setFormError(editingBrand ? t('cardBrands.updateError') : t('cardBrands.createError'));
+      setFormError(translateApiError(submissionError));
     }
   };
 
@@ -84,11 +85,7 @@ export function CardBrands() {
       setError('');
       toast.success(t('cardBrands.deleted'));
     } catch (deletionError) {
-      if (deletionError instanceof BandeiraCartaoApiError && deletionError.statusCode === 409) {
-        toast.error(t('cardBrands.deleteInUseError'));
-        return;
-      }
-      toast.error(t('cardBrands.deleteError'));
+      toast.error(translateApiError(deletionError));
     }
   };
 
@@ -107,7 +104,12 @@ export function CardBrands() {
           <DialogHeader>
             <DialogTitle>{editingBrand ? t('cardBrands.edit') : t('cardBrands.new')}</DialogTitle>
           </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form
+            onSubmit={handleSubmit}
+            onInvalid={(event) => (event.target as HTMLInputElement).setCustomValidity(t('common.required'))}
+            onInput={(event) => (event.target as HTMLInputElement).setCustomValidity('')}
+            className="space-y-4"
+          >
             <div className="space-y-2">
               <Label htmlFor="card-brand-description" required>
                 {t('cardBrands.description')}
@@ -141,7 +143,10 @@ export function CardBrands() {
       {error && <p className="text-sm text-rose-600">{error}</p>}
 
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-        <div className="flex items-center justify-end gap-3 border-b border-slate-200 px-5 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+          <div>
+            <p className="mt-1 text-xs text-slate-500">{t('cardBrands.listTitle')}</p>
+          </div>
           <Button
             type="button"
             onClick={openCreateDialog}
