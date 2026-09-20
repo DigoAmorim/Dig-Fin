@@ -1,5 +1,5 @@
-import { CATEGORY_ICONS } from '@/lib/CategoryIcons'
-import { cn } from '@/lib/Utils'
+import { CATEGORY_ICONS } from '@/lib/category-icons'
+import { cn } from '@/lib/utils'
 
 interface IconPickerProps {
   value: string

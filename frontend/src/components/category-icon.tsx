@@ -1,6 +1,6 @@
-import { ICON_MAP, isEmoji } from '@/lib/CategoryIcons'
+import { ICON_MAP, isEmoji } from '@/lib/category-icons'
 import { CircleHelp } from 'lucide-react'
-import { cn } from '@/lib/Utils'
+import { cn } from '@/lib/utils'
 
 const SIZES = {
   xs: { box: 'w-4 h-4 rounded', icon: 10 },

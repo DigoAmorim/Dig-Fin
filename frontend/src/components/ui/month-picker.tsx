@@ -1,6 +1,8 @@
 import * as React from 'react'
+import { addYears, format, isBefore, isAfter, isSameMonth, setMonth, setYear, startOfMonth } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { cn } from '../../lib/Utils'
+import { cn } from '../../lib/utils'
 
 type Month = {
   number: number
@@ -52,11 +54,11 @@ function MonthPicker({
   const selectedMonthIdx = selectedMonth?.getMonth()
 
   const handlePrevYear = () => {
-    setMenuYear((prev) => prev - 1)
+    setMenuYear((prev) => addYears(new Date(prev, 0, 1), -1).getFullYear())
   }
 
   const handleNextYear = () => {
-    setMenuYear((prev) => prev + 1)
+    setMenuYear((prev) => addYears(new Date(prev, 0, 1), 1).getFullYear())
   }
 
   return (
@@ -85,27 +87,19 @@ function MonthPicker({
 
       <div className="grid grid-cols-4 gap-1.5">
           {MONTHS.flat().map((m) => {
-                const monthDate = new Date(menuYear, m.number, 1)
-                const isSelected = selectedYear === menuYear && selectedMonthIdx === m.number
+                const monthDate = startOfMonth(setMonth(setYear(new Date(), menuYear), m.number))
+                const isSelected = selectedMonth ? isSameMonth(selectedMonth, monthDate) : selectedYear === menuYear && selectedMonthIdx === m.number
 
                 let isDisabled = false
                 if (minDate) {
-                  if (menuYear < minDate.getFullYear()) {
-                    isDisabled = true
-                  } else if (menuYear === minDate.getFullYear() && m.number < minDate.getMonth()) {
-                    isDisabled = true
-                  }
+                  isDisabled = isBefore(monthDate, startOfMonth(minDate))
                 }
                 if (maxDate) {
-                  if (menuYear > maxDate.getFullYear()) {
-                    isDisabled = true
-                  } else if (menuYear === maxDate.getFullYear() && m.number > maxDate.getMonth()) {
-                    isDisabled = true
-                  }
+                  isDisabled = isDisabled || isAfter(monthDate, startOfMonth(maxDate))
                 }
 
                 const displayMonthName = locale
-                  ? new Intl.DateTimeFormat(locale, { month: 'short' }).format(monthDate).replace('.', '')
+                  ? format(monthDate, 'MMM', { locale: ptBR }).replace('.', '')
                   : m.name
 
                 return (

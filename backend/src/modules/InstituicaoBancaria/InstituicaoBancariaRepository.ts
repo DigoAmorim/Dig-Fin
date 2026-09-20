@@ -3,14 +3,16 @@ import { pool } from '../../../database/Pool';
 import type { InstituicaoBancaria, InstituicaoBancariaInput } from './InstituicaoBancariaTypes';
 
 interface InstituicaoBancariaRow extends QueryResultRow {
-    id: number;
+    id: string;
     name: string;
 }
 
 const instituicaoBancariaSelect = `
-    SELECT id, nome AS name
+    SELECT id::text AS id, nome AS name
     FROM digfin.instituicao_bancaria
 `;
+
+const mapRow = (row: InstituicaoBancariaRow): InstituicaoBancaria => ({ ...row, id: Number(row.id) });
 
 export class InstituicaoBancariaRepository {
     constructor(private readonly contaId: string) {}
@@ -20,7 +22,7 @@ export class InstituicaoBancariaRepository {
             `${instituicaoBancariaSelect} WHERE conta_id = $1 ORDER BY nome`,
             [this.contaId],
         );
-        return result.rows;
+        return result.rows.map(mapRow);
     }
 
     async create(input: InstituicaoBancariaInput): Promise<InstituicaoBancaria> {
@@ -28,7 +30,7 @@ export class InstituicaoBancariaRepository {
             `
                 INSERT INTO digfin.instituicao_bancaria (conta_id, nome)
                 VALUES ($1, $2)
-                RETURNING id, nome AS name
+                RETURNING id::text AS id, nome AS name
             `,
             [this.contaId, input.name],
         );
@@ -36,7 +38,7 @@ export class InstituicaoBancariaRepository {
         if (!instituicao) {
             throw new Error('Não foi possível criar a instituição bancária.');
         }
-        return instituicao;
+        return mapRow(instituicao);
     }
 
     async update(id: number, input: InstituicaoBancariaInput): Promise<InstituicaoBancaria | null> {
@@ -45,11 +47,11 @@ export class InstituicaoBancariaRepository {
                 UPDATE digfin.instituicao_bancaria
                 SET nome = $1
                 WHERE id = $2 AND conta_id = $3
-                RETURNING id, nome AS name
+                RETURNING id::text AS id, nome AS name
             `,
             [input.name, id, this.contaId],
         );
-        return result.rows[0] ?? null;
+        return result.rows[0] ? mapRow(result.rows[0]) : null;
     }
 
     async delete(id: number): Promise<boolean> {

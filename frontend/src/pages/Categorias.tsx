@@ -3,29 +3,29 @@ import { useTranslation } from 'react-i18next';
 import { ChevronDown, ChevronRight, CircleHelp, Pencil, Plus, Trash2 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
-import { categoriaApi } from '../lib/CategoriaApi.ts';
-import { translateApiError } from '../lib/ApiError.ts';
-import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/Categoria.ts';
-import { Button } from '../components/ui/Button.tsx';
-import { Input } from '../components/ui/Input.tsx';
-import { Label } from '../components/ui/Label.tsx';
+import { categoriaApi } from '../lib/categoria-api.ts';
+import { translateApiError } from '../lib/api-error.ts';
+import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/categoria.ts';
+import { Button } from '../components/ui/button.tsx';
+import { Input } from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
-import { ICON_MAP } from '../lib/CategoryIcons.ts';
-import { IconPicker } from '../components/IconPicker.tsx';
+} from '../components/ui/dialog.tsx';
+import { PageHeader } from '../components/page-header.tsx';
+import { ICON_MAP } from '../lib/category-icons.ts';
+import { IconPicker } from '../components/icon-picker.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/Select.tsx';
+} from '../components/ui/select.tsx';
 
 const getIcon = (name: string): LucideIcon => ICON_MAP[name] ?? CircleHelp;
 

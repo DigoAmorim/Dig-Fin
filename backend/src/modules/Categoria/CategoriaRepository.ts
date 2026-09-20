@@ -3,29 +3,36 @@ import { pool } from '../../../database/Pool';
 import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from './CategoriaTypes';
 
 interface CategoriaRow extends QueryResultRow {
-    id: number;
+    id: string;
     name: string;
     color: string;
     icon: string;
 }
 
 interface SubcategoriaRow extends QueryResultRow {
-    id: number;
-    categoryId: number | null;
+    id: string;
+    categoryId: string | null;
     name: string;
     color: string;
     icon: string;
 }
 
 const categorySelect = `
-    SELECT id, nome AS name, cor AS color, icone AS icon
+    SELECT id::text AS id, nome AS name, cor AS color, icone AS icon
     FROM digfin.categoria
 `;
 
 const subcategorySelect = `
-    SELECT id, categoria_id AS "categoryId", nome AS name, cor AS color, icone AS icon
+    SELECT id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
     FROM digfin.subcategoria
 `;
+
+const mapCategory = (row: CategoriaRow): Categoria => ({ ...row, id: Number(row.id), subcategories: [] });
+const mapSubcategory = (row: SubcategoriaRow): Subcategoria => ({
+    ...row,
+    id: Number(row.id),
+    categoryId: row.categoryId === null ? null : Number(row.categoryId),
+});
 
 export class CategoriaRepository {
     constructor(private readonly contaId: string) {}
@@ -42,12 +49,14 @@ export class CategoriaRepository {
             ),
         ]);
 
+        const mappedCategories = categories.rows.map(mapCategory);
+        const mappedSubcategories = subcategories.rows.map(mapSubcategory);
         return {
-            categories: categories.rows.map((category) => ({
+            categories: mappedCategories.map((category) => ({
                 ...category,
-                subcategories: subcategories.rows.filter((subcategory) => subcategory.categoryId === category.id),
+                subcategories: mappedSubcategories.filter((subcategory) => subcategory.categoryId === category.id),
             })),
-            ungroupedSubcategories: subcategories.rows.filter((subcategory) => subcategory.categoryId === null),
+            ungroupedSubcategories: mappedSubcategories.filter((subcategory) => subcategory.categoryId === null),
         };
     }
 
@@ -56,13 +65,13 @@ export class CategoriaRepository {
             `
                 INSERT INTO digfin.categoria (conta_id, nome, cor, icone)
                 VALUES ($1, $2, $3, $4)
-                RETURNING id, nome AS name, cor AS color, icone AS icon
+                RETURNING id::text AS id, nome AS name, cor AS color, icone AS icon
             `,
             [this.contaId, input.name, input.color, input.icon],
         );
         const category = result.rows[0];
         if (!category) throw new Error('Could not create category.');
-        return { ...category, subcategories: [] };
+        return { ...mapCategory(category) };
     }
 
     async update(id: number, input: CategoriaInput): Promise<Categoria | null> {
@@ -71,12 +80,12 @@ export class CategoriaRepository {
                 UPDATE digfin.categoria
                 SET nome = $1, cor = $2, icone = $3, atualizado_em = NOW()
                 WHERE id = $4 AND conta_id = $5
-                RETURNING id, nome AS name, cor AS color, icone AS icon
+                RETURNING id::text AS id, nome AS name, cor AS color, icone AS icon
             `,
             [input.name, input.color, input.icon, id, this.contaId],
         );
         const category = result.rows[0];
-        return category ? { ...category, subcategories: [] } : null;
+        return category ? mapCategory(category) : null;
     }
 
     async exists(id: number): Promise<boolean> {
@@ -108,13 +117,13 @@ export class CategoriaRepository {
             `
                 INSERT INTO digfin.subcategoria (conta_id, categoria_id, nome, cor, icone)
                 VALUES ($1, $2, $3, $4, $5)
-                RETURNING id, categoria_id AS "categoryId", nome AS name, cor AS color, icone AS icon
+                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
             `,
             [this.contaId, input.categoryId, input.name, input.color, input.icon],
         );
         const subcategory = result.rows[0];
         if (!subcategory) throw new Error('Could not create subcategory.');
-        return subcategory;
+        return mapSubcategory(subcategory);
     }
 
     async updateSubcategory(id: number, input: SubcategoriaInput): Promise<Subcategoria | null> {
@@ -123,11 +132,11 @@ export class CategoriaRepository {
                 UPDATE digfin.subcategoria
                 SET categoria_id = $1, nome = $2, cor = $3, icone = $4, atualizado_em = NOW()
                 WHERE id = $5 AND conta_id = $6
-                RETURNING id, categoria_id AS "categoryId", nome AS name, cor AS color, icone AS icon
+                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
             `,
             [input.categoryId, input.name, input.color, input.icon, id, this.contaId],
         );
-        return result.rows[0] ?? null;
+        return result.rows[0] ? mapSubcategory(result.rows[0]) : null;
     }
 
     async deleteSubcategory(id: number): Promise<boolean> {

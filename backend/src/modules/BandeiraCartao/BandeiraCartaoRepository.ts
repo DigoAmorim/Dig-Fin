@@ -3,14 +3,16 @@ import { pool } from '../../../database/Pool';
 import type { BandeiraCartao, BandeiraCartaoInput } from './BandeiraCartaoTypes';
 
 interface BandeiraCartaoRow extends QueryResultRow {
-    id: number;
+    id: string;
     description: string;
 }
 
 const bandeiraCartaoSelect = `
-    SELECT id, descricao AS description
+    SELECT id::text AS id, descricao AS description
     FROM digfin.bandeira_cartao
 `;
+
+const mapRow = (row: BandeiraCartaoRow): BandeiraCartao => ({ ...row, id: Number(row.id) });
 
 export class BandeiraCartaoRepository {
     constructor(private readonly contaId: string) {}
@@ -20,7 +22,7 @@ export class BandeiraCartaoRepository {
             `${bandeiraCartaoSelect} WHERE conta_id = $1 ORDER BY descricao`,
             [this.contaId],
         );
-        return result.rows;
+        return result.rows.map(mapRow);
     }
 
     async create(input: BandeiraCartaoInput): Promise<BandeiraCartao> {
@@ -28,7 +30,7 @@ export class BandeiraCartaoRepository {
             `
                 INSERT INTO digfin.bandeira_cartao (conta_id, descricao)
                 VALUES ($1, $2)
-                RETURNING id, descricao AS description
+                RETURNING id::text AS id, descricao AS description
             `,
             [this.contaId, input.description],
         );
@@ -36,7 +38,7 @@ export class BandeiraCartaoRepository {
         if (!bandeiraCartao) {
             throw new Error('Não foi possível criar a bandeira.');
         }
-        return bandeiraCartao;
+        return mapRow(bandeiraCartao);
     }
 
     async update(id: number, input: BandeiraCartaoInput): Promise<BandeiraCartao | null> {
@@ -45,11 +47,11 @@ export class BandeiraCartaoRepository {
                 UPDATE digfin.bandeira_cartao
                 SET descricao = $1
                 WHERE id = $2 AND conta_id = $3
-                RETURNING id, descricao AS description
+                RETURNING id::text AS id, descricao AS description
             `,
             [input.description, id, this.contaId],
         );
-        return result.rows[0] ?? null;
+        return result.rows[0] ? mapRow(result.rows[0]) : null;
     }
 
     async delete(id: number): Promise<boolean> {

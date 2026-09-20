@@ -1,25 +1,25 @@
 import { lazy, Suspense, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Layout } from './components/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { Toaster } from './components/ui/Sonner';
+import { Layout } from './components/layout';
+import { Dashboard } from './pages/dashboard';
+import { Toaster } from './components/ui/sonner';
+import { pageTitleKeys, type PageKey } from './config/navigation';
 
-const CardBrands = lazy(() => import('./pages/BandeiraCartao').then(({ CardBrands }) => ({ default: CardBrands })));
-const BankInstitutions = lazy(() => import('./pages/InstituicaoBancaria').then(({ BankInstitutions }) => ({ default: BankInstitutions })));
-const BankAccounts = lazy(() => import('./pages/ContaBancaria').then(({ BankAccounts }) => ({ default: BankAccounts })));
-const CreditCards = lazy(() => import('./pages/CartaoCredito').then(({ CreditCards }) => ({ default: CreditCards })));
-const Categories = lazy(() => import('./pages/Categorias').then(({ Categories }) => ({ default: Categories })));
-const Transacoes = lazy(() => import('./pages/Transacoes').then(({ Transacoes }) => ({ default: Transacoes })));
+const CardBrands = lazy(() => import('./pages/bandeira-cartao').then(({ CardBrands }) => ({ default: CardBrands })));
+const BankInstitutions = lazy(() => import('./pages/instituicao-bancaria').then(({ BankInstitutions }) => ({ default: BankInstitutions })));
+const BankAccounts = lazy(() => import('./pages/conta-bancaria').then(({ BankAccounts }) => ({ default: BankAccounts })));
+const CreditCards = lazy(() => import('./pages/cartao-credito').then(({ CreditCards }) => ({ default: CreditCards })));
+const Categories = lazy(() => import('./pages/categorias').then(({ Categories }) => ({ default: Categories })));
+const Transacoes = lazy(() => import('./pages/transacoes').then(({ Transacoes }) => ({ default: Transacoes })));
 
 function App() {
   const { t } = useTranslation();
-  // Estado que controla qual tela está ativa
-  const [activePage, setActivePage] = useState('dashboard');
+  const [activePage, setActivePage] = useState<PageKey>('dashboard');
 
   return (
     <>
       <Layout
-        title={activePage === 'dashboard' ? t('navigation.overview') : activePage === 'transactions' ? t('navigation.transactions') : activePage === 'card-brands' ? t('navigation.cardBrands') : activePage === 'bank-institutions' ? t('navigation.bankInstitutions') : activePage === 'bank-accounts' ? t('navigation.bankAccounts') : activePage === 'credit-cards' ? t('navigation.creditCards') : activePage === 'categories' ? t('navigation.categories') : activePage}
+        title={t(pageTitleKeys[activePage])}
         activePage={activePage}
         setActivePage={setActivePage}
       >

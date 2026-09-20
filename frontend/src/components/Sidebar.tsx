@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   ArrowRightLeft,
   Building2,
@@ -11,14 +12,16 @@ import {
   Receipt,
   Wallet,
 } from 'lucide-react';
+import type { PageKey } from '../config/navigation';
 
 // 1. Definimos o que o Sidebar precisa receber de fora (Props)
 interface SidebarProps {
-  activePage: string;
-  setActivePage: (page: string) => void;
+  activePage: PageKey;
+  setActivePage: (page: PageKey) => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) => {
+export function Sidebar({ activePage, setActivePage }: SidebarProps) {
+  const { t } = useTranslation();
   const [expandedSections, setExpandedSections] = useState({
     accounts: true,
     settings: true,
@@ -40,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white">
               S
             </div>
-            <span className="font-semibold text-lg tracking-tight text-slate-900">Securo</span>
+            <span className="font-semibold text-lg tracking-tight text-slate-900">Dig Fin</span>
           </div>
           <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-mono">
             v0.15
@@ -49,9 +52,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
 
         {/* Barra de Busca */}
         <button className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-500 transition cursor-pointer">
-          <span className="flex items-center gap-2">
+            <span className="flex items-center gap-2">
             <Search className="w-3.5 h-3.5 text-slate-400" />
-            Buscar algo...
+              {t('common.search')}
           </span>
           <kbd className="bg-slate-200 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-600">Ctrl K</kbd>
         </button>
@@ -64,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             aria-expanded={expandedSections.accounts}
             className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2 hover:text-slate-600 transition cursor-pointer"
           >
-            Accounts
+            {t('navigation.accounts')}
             <ChevronRight
               className={`w-3.5 h-3.5 transition-transform ${expandedSections.accounts ? 'rotate-90' : ''}`}
             />
@@ -79,7 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <ArrowRightLeft className="w-4 h-4" />
-              Visão Geral
+              {t('navigation.overview')}
             </button>
             <button
               onClick={() => setActivePage('transactions')}
@@ -90,7 +93,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <Receipt className="w-4 h-4" />
-              Transações
+              {t('navigation.transactions')}
             </button>
 
           </nav>}
@@ -104,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             aria-expanded={expandedSections.settings}
             className="w-full flex items-center justify-between text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-2 px-2 hover:text-slate-600 transition cursor-pointer"
           >
-            Configurações
+            {t('navigation.settings')}
             <ChevronRight
               className={`w-3.5 h-3.5 transition-transform ${expandedSections.settings ? 'rotate-90' : ''}`}
             />
@@ -119,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <Target className="w-4 h-4" />
-              Bandeira do Cartão
+              {t('navigation.cardBrands')}
             </button>
             <button
               onClick={() => setActivePage('credit-cards')}
@@ -130,7 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <CreditCard className="w-4 h-4" />
-              Cartão de Crédito
+              {t('navigation.creditCards')}
             </button>            
             <button
               onClick={() => setActivePage('bank-institutions')}
@@ -141,7 +144,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <Building2 className="w-4 h-4" />
-              Instituição Bancária
+              {t('navigation.bankInstitutions')}
             </button>
             <button
               onClick={() => setActivePage('bank-accounts')}
@@ -152,7 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <Wallet className="w-4 h-4" />
-              Conta Bancária
+              {t('navigation.bankAccounts')}
             </button>
             <button
               onClick={() => setActivePage('categories')}
@@ -163,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
               }`}
             >
               <Tags className="w-4 h-4" />
-              Categorias
+              {t('navigation.categories')}
             </button>
           </nav>}
         </div>
@@ -176,12 +179,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             P
           </div>
           <div className="truncate">
-            <p className="text-xs font-medium text-slate-800 truncate">Pessoal</p>
-            <p className="text-[10px] text-slate-500 truncate">demo@securo.app</p>
+            <p className="text-xs font-medium text-slate-800 truncate">{t('common.personal')}</p>
+            <p className="text-[10px] text-slate-500 truncate">demo@digfin.app</p>
           </div>
         </div>
         <ChevronDown className="w-4 h-4 text-slate-400 cursor-pointer" />
       </div>
     </aside>
   );
-};
+}

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowUpRight } from 'lucide-react';
 
 // --- Tipos de Dados ---
@@ -18,8 +18,9 @@ interface CategorySpending {
   percentage: number;
 }
 
-export const Dashboard: React.FC = () => {
-  // Os mesmos dados que você já tinha
+export function Dashboard() {
+  const { t, i18n } = useTranslation();
+  const formatCurrency = (amount: number) => new Intl.NumberFormat(i18n.language, { style: 'currency', currency: 'BRL' }).format(amount);
   const transactions: Transaction[] = [
     { id: '1', date: '26/09/2026', description: 'Aluguel (Recorrente)', account: 'Conta Corrente', amount: -950.00 },
     { id: '2', date: '25/09/2026', description: 'Academia', account: 'Cartão de Crédito', amount: -99.90 },
@@ -28,9 +29,9 @@ export const Dashboard: React.FC = () => {
   ];
 
   const categories: CategorySpending[] = [
-    { category: 'Aluguel', spent: 1900.00, budget: 1000.00, trend: 'down', percentage: 50 },
-    { category: 'Viagem', spent: 495.77, budget: 700.00, trend: 'up', percentage: 81 },
-    { category: 'Alimentação', spent: 166.73, budget: 850.00, trend: 'down', percentage: 67 },
+    { category: t('dashboard.rent'), spent: 1900.00, budget: 1000.00, trend: 'down', percentage: 50 },
+    { category: t('dashboard.travel'), spent: 495.77, budget: 700.00, trend: 'up', percentage: 81 },
+    { category: t('dashboard.food'), spent: 166.73, budget: 850.00, trend: 'down', percentage: 67 },
   ];
 
   return (
@@ -40,34 +41,34 @@ export const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {/* Card 1: Saldo Total */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 mb-1">Saldo Total</p>
-          <p className="text-2xl font-bold text-slate-900 font-mono tracking-tight">R$ 381.743,83</p>
-          <p className="text-[11px] text-slate-500 mt-2">Ativos: R$ 352.953,04</p>
+          <p className="text-xs font-medium text-slate-500 mb-1">{t('dashboard.totalBalance')}</p>
+          <p className="text-2xl font-bold text-slate-900 font-mono tracking-tight">{formatCurrency(381743.83)}</p>
+          <p className="text-[11px] text-slate-500 mt-2">{t('dashboard.assets', { amount: formatCurrency(352953.04) })}</p>
         </div>
 
         {/* Card 2: Receita Mensal */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 mb-1">Receita Mensal</p>
+          <p className="text-xs font-medium text-slate-500 mb-1">{t('dashboard.monthlyIncome')}</p>
           <p className="text-2xl font-bold text-emerald-600 font-mono tracking-tight flex items-center gap-1">
-            +R$ 8.872,10
+            +{formatCurrency(8872.10)}
           </p>
           <p className="text-[11px] text-emerald-600 mt-2 flex items-center gap-0.5">
-            <ArrowUpRight className="w-3 h-3" /> Fluxo positivo no mês
+            <ArrowUpRight className="w-3 h-3" /> {t('dashboard.positiveFlow')}
           </p>
         </div>
 
         {/* Card 3: Despesa Mensal */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 mb-1">Despesas Mensais</p>
+          <p className="text-xs font-medium text-slate-500 mb-1">{t('dashboard.monthlyExpenses')}</p>
           <p className="text-2xl font-bold text-rose-600 font-mono tracking-tight flex items-center gap-1">
-            -R$ 3.332,62
+            -{formatCurrency(3332.62)}
           </p>
-          <p className="text-[11px] text-slate-500 mt-2">Ritmo estimado: R$ 6.665,24</p>
+          <p className="text-[11px] text-slate-500 mt-2">{t('dashboard.estimatedPace', { amount: formatCurrency(6665.24) })}</p>
         </div>
 
         {/* Card 4: Taxa de Poupança */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-4">
-          <p className="text-xs font-medium text-slate-500 mb-1">Taxa de Poupança</p>
+          <p className="text-xs font-medium text-slate-500 mb-1">{t('dashboard.savingsRate')}</p>
           <p className="text-2xl font-bold text-blue-600 font-mono tracking-tight">62%</p>
           <div className="w-full bg-slate-100 h-1.5 rounded-full mt-3 overflow-hidden">
             <div className="bg-blue-600 h-full rounded-full" style={{ width: '62%' }} />
@@ -80,8 +81,8 @@ export const Dashboard: React.FC = () => {
         {/* Gastos por Categoria */}
         <div className="lg:col-span-2 bg-white border border-slate-200 shadow-sm rounded-xl p-5">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-800">Gastos por Categoria</h2>
-            <span className="text-xs text-slate-400">Maior valor primeiro</span>
+            <h2 className="text-sm font-semibold text-slate-800">{t('dashboard.categorySpending')}</h2>
+            <span className="text-xs text-slate-400">{t('dashboard.highestFirst')}</span>
           </div>
 
           <div className="space-y-4">
@@ -90,7 +91,7 @@ export const Dashboard: React.FC = () => {
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-medium text-slate-700">{cat.category}</span>
                   <span className="font-mono text-slate-800">
-                    R$ {cat.spent.toFixed(2)} <span className="text-slate-400">/ de R$ {cat.budget.toFixed(2)}</span>
+                    {formatCurrency(cat.spent)} <span className="text-slate-400">/ {t('dashboard.of')} {formatCurrency(cat.budget)}</span>
                   </span>
                 </div>
                 <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
@@ -106,28 +107,28 @@ export const Dashboard: React.FC = () => {
 
         {/* Progresso de Metas */}
         <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-slate-800">Progresso de Metas</h2>
+          <h2 className="text-sm font-semibold text-slate-800">{t('dashboard.goalsProgress')}</h2>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-medium text-slate-700">Reserva de Emergência</span>
+              <span className="font-medium text-slate-700">{t('dashboard.emergencyFund')}</span>
               <span className="text-emerald-600 font-mono font-medium">63%</span>
             </div>
             <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
               <div className="bg-emerald-500 h-full rounded-full" style={{ width: '63%' }} />
             </div>
-            <p className="text-[11px] text-slate-500">R$ 5.000,00 de R$ 8.000,00</p>
+            <p className="text-[11px] text-slate-500">{formatCurrency(5000)} {t('dashboard.of')} {formatCurrency(8000)}</p>
           </div>
 
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-lg space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="font-medium text-slate-700">Viagem ao Japão</span>
+              <span className="font-medium text-slate-700">{t('dashboard.japanTrip')}</span>
               <span className="text-blue-600 font-mono font-medium">42%</span>
             </div>
             <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
               <div className="bg-blue-600 h-full rounded-full" style={{ width: '42%' }} />
             </div>
-            <p className="text-[11px] text-slate-500">R$ 2.500,00 de R$ 6.000,00</p>
+            <p className="text-[11px] text-slate-500">{formatCurrency(2500)} {t('dashboard.of')} {formatCurrency(6000)}</p>
           </div>
         </div>
       </div>
@@ -135,18 +136,18 @@ export const Dashboard: React.FC = () => {
       {/* Tabela de Transações Recentes */}
       <div className="bg-white border border-slate-200 shadow-sm rounded-xl p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-slate-800">Transações do Período</h2>
-          <button className="text-xs text-emerald-600 hover:underline font-medium">Ver todas →</button>
+          <h2 className="text-sm font-semibold text-slate-800">{t('dashboard.periodTransactions')}</h2>
+          <button className="text-xs text-emerald-600 hover:underline font-medium">{t('dashboard.viewAll')} →</button>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs text-slate-700">
             <thead className="bg-slate-50 text-slate-500 uppercase text-[10px] font-semibold tracking-wider border-b border-slate-200">
               <tr>
-                <th className="px-4 py-2.5">Data</th>
-                <th className="px-4 py-2.5">Descrição</th>
-                <th className="px-4 py-2.5">Conta</th>
-                <th className="px-4 py-2.5 text-right">Valor</th>
+                <th className="px-4 py-2.5">{t('dashboard.date')}</th>
+                <th className="px-4 py-2.5">{t('dashboard.description')}</th>
+                <th className="px-4 py-2.5">{t('dashboard.account')}</th>
+                <th className="px-4 py-2.5 text-right">{t('dashboard.amount')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
@@ -161,8 +162,8 @@ export const Dashboard: React.FC = () => {
                     }`}
                   >
                     {tx.amount < 0
-                      ? `-R$ ${Math.abs(tx.amount).toFixed(2)}`
-                      : `+R$ ${tx.amount.toFixed(2)}`}
+                      ? `-${formatCurrency(Math.abs(tx.amount))}`
+                      : `+${formatCurrency(tx.amount)}`}
                   </td>
                 </tr>
               ))}
@@ -173,4 +174,4 @@ export const Dashboard: React.FC = () => {
 
     </>
   );
-};
+}

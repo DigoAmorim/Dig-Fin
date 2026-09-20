@@ -38,6 +38,11 @@ Enquanto a autenticação ainda não foi implementada, `CONTA_ID` define a conta
 - `PUT /api/categorias/:id`: atualiza uma categoria.
 - `DELETE /api/categorias/:id`: remove uma categoria sem subcategorias.
 - `POST /api/categorias/subcategorias`: cria uma subcategoria, com `categoryId` opcional.
+- `GET /api/transacoes`: lista as transações da conta de desenvolvimento.
+- `POST /api/transacoes`: cria uma despesa e suas parcelas.
+- `PUT /api/transacoes/:id`: atualiza um lançamento.
+- `DELETE /api/transacoes/:id`: remove o parcelamento inteiro ao informar qualquer parcela.
+- Transferências são persistidas como dois lançamentos vinculados: um negativo na conta origem e um positivo na conta destino.
 - `PUT /api/categorias/subcategorias/:id`: atualiza uma subcategoria.
 - `DELETE /api/categorias/subcategorias/:id`: remove uma subcategoria.
 

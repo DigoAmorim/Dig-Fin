@@ -2,6 +2,7 @@ import { ErroAplicacao } from '../../shared/errors/AppError';
 import { env } from '../../config/Env';
 import { ContaBancariaRepository } from './ContaBancariaRepository';
 import type { ContaBancaria, ContaBancariaInput } from './ContaBancariaTypes';
+import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class ContaBancariaService {
     constructor(private readonly repository = new ContaBancariaRepository(env.contaId)) {}
@@ -29,9 +30,14 @@ export class ContaBancariaService {
     }
 
     async delete(id: string): Promise<void> {
-        const deleted = await this.repository.delete(id);
-        if (!deleted) {
-            throw new ErroAplicacao(404, 'bankAccountNotFound');
+        try {
+            const deleted = await this.repository.delete(id);
+            if (!deleted) {
+                throw new ErroAplicacao(404, 'bankAccountNotFound');
+            }
+        } catch (error) {
+            if (isPostgresError(error) && error.code === '23503') throw new ErroAplicacao(409, 'bankAccountInUse');
+            throw error;
         }
     }
 

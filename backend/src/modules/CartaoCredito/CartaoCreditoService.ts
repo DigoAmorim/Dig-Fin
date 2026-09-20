@@ -2,6 +2,7 @@ import { env } from '../../config/Env';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { CartaoCreditoRepository } from './CartaoCreditoRepository';
 import type { CartaoCredito, CartaoCreditoInput } from './CartaoCreditoTypes';
+import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class CartaoCreditoService {
     constructor(private readonly repository = new CartaoCreditoRepository(env.contaId)) {}
@@ -29,9 +30,14 @@ export class CartaoCreditoService {
     }
 
     async delete(id: string): Promise<void> {
-        const deleted = await this.repository.delete(id);
-        if (!deleted) {
-            throw new ErroAplicacao(404, 'creditCardNotFound');
+        try {
+            const deleted = await this.repository.delete(id);
+            if (!deleted) {
+                throw new ErroAplicacao(404, 'creditCardNotFound');
+            }
+        } catch (error) {
+            if (isPostgresError(error) && error.code === '23503') throw new ErroAplicacao(409, 'creditCardInUse');
+            throw error;
         }
     }
 

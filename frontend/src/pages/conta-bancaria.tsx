@@ -1,117 +1,87 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { contaBancariaApi, ContaBancariaApiError } from '../lib/ContaBancariaApi.ts';
-import { instituicaoBancariaApi } from '../lib/InstituicaoBancariaApi.ts';
-import { translateApiError } from '../lib/ApiError.ts';
-import type { ContaBancaria } from '../types/ContaBancaria.ts';
-import type { InstituicaoBancaria } from '../types/InstituicaoBancaria.ts';
-import { Button } from '../components/ui/Button.tsx';
-import { Input } from '../components/ui/Input.tsx';
-import { Label } from '../components/ui/Label.tsx';
+import { contaBancariaApi } from '../lib/conta-bancaria-api.ts';
+import { instituicaoBancariaApi } from '../lib/instituicao-bancaria-api.ts';
+import type { ContaBancaria, ContaBancariaInput } from '../types/conta-bancaria.ts';
+import type { InstituicaoBancaria } from '../types/instituicao-bancaria.ts';
+import { useCrudResource } from '../hooks/use-crud-resource.ts';
+import { Button } from '../components/ui/button.tsx';
+import { Input } from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/Select.tsx';
+} from '../components/ui/select.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
+} from '../components/ui/dialog.tsx';
+import { PageHeader } from '../components/page-header.tsx';
+
+const sortAccounts = (items: ContaBancaria[]) => [...items].sort((a, b) => a.name.localeCompare(b.name));
 
 export function BankAccounts() {
   const { t } = useTranslation();
-  const [accounts, setAccounts] = useState<ContaBancaria[]>([]);
   const [institutions, setInstitutions] = useState<InstituicaoBancaria[]>([]);
+  const [institutionsError, setInstitutionsError] = useState('');
   const [name, setName] = useState('');
   const [bankInstitutionId, setBankInstitutionId] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingAccount, setEditingAccount] = useState<ContaBancaria | null>(null);
-  const [deletingAccount, setDeletingAccount] = useState<ContaBancaria | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [formError, setFormError] = useState('');
-  const [error, setError] = useState('');
+  const {
+    items: accounts,
+    editingItem: editingAccount,
+    deletingItem: deletingAccount,
+    isFormOpen,
+    isLoading,
+    error,
+    formError,
+    setDeletingItem: setDeletingAccount,
+    openCreate,
+    openEdit,
+    closeForm,
+    save,
+    remove,
+  } = useCrudResource<ContaBancaria, ContaBancariaInput>({
+    api: contaBancariaApi,
+    loadErrorMessage: t('bankAccounts.loadError'),
+    createdMessage: t('bankAccounts.created'),
+    updatedMessage: t('bankAccounts.updated'),
+    deletedMessage: t('bankAccounts.deleted'),
+    sortItems: sortAccounts,
+  });
 
   useEffect(() => {
-    Promise.all([contaBancariaApi.list(), instituicaoBancariaApi.list()])
-      .then(([loadedAccounts, loadedInstitutions]) => {
-        setAccounts(loadedAccounts);
-        setInstitutions(loadedInstitutions);
-      })
-      .catch(() => setError(t('bankAccounts.loadError')))
-      .finally(() => setIsLoading(false));
+    instituicaoBancariaApi.list()
+      .then(setInstitutions)
+      .catch(() => setInstitutionsError(t('bankAccounts.loadError')));
   }, [t]);
 
   const resetForm = () => {
     setName('');
     setBankInstitutionId('');
-    setFormError('');
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFormError('');
-    try {
-      const input = {
-        name,
-        bankInstitutionId,
-      };
-      const saved = editingAccount
-        ? await contaBancariaApi.update(editingAccount.id, input)
-        : await contaBancariaApi.create(input);
-
-      setAccounts((current) => {
-        const next = editingAccount
-          ? current.map((account) => account.id === saved.id ? saved : account)
-          : [...current, saved];
-        return next.sort((first, second) => first.name.localeCompare(second.name));
-      });
-
-      setIsFormOpen(false);
-      setEditingAccount(null);
-      resetForm();
-      toast.success(editingAccount ? t('bankAccounts.updated') : t('bankAccounts.created'));
-    } catch (submissionError) {
-      if (submissionError instanceof ContaBancariaApiError) {
-        setFormError(translateApiError(submissionError));
-        return;
-      }
-      setFormError(translateApiError(submissionError));
-    }
+    const saved = await save({ name, bankInstitutionId });
+    if (saved) resetForm();
   };
 
   const openCreateDialog = () => {
-    setEditingAccount(null);
     resetForm();
-    setIsFormOpen(true);
+    openCreate();
   };
 
   const openEditDialog = (account: ContaBancaria) => {
-    setEditingAccount(account);
     setName(account.name);
     setBankInstitutionId(account.bankInstitutionId);
-    setFormError('');
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingAccount) return;
-
-    try {
-      await contaBancariaApi.remove(deletingAccount.id);
-      setAccounts((current) => current.filter((account) => account.id !== deletingAccount.id));
-      setDeletingAccount(null);
-      toast.success(t('bankAccounts.deleted'));
-    } catch (deletionError) {
-      toast.error(translateApiError(deletionError));
-    }
+    openEdit(account);
   };
 
   return (
@@ -119,11 +89,7 @@ export function BankAccounts() {
       <PageHeader section={t('bankAccounts.section')} title={t('bankAccounts.title')} />
 
       <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open) {
-          setEditingAccount(null);
-          resetForm();
-        }
+        if (!open) { closeForm(); resetForm(); }
       }}>
         <DialogContent>
           <DialogHeader>
@@ -170,14 +136,14 @@ export function BankAccounts() {
 
             {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>{t('common.cancel')}</Button>
+              <Button type="button" variant="outline" onClick={() => { closeForm(); resetForm(); }}>{t('common.cancel')}</Button>
               <Button type="submit">{t('common.save')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {(error || institutionsError) && <p className="text-sm text-rose-600">{error || institutionsError}</p>}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
@@ -225,7 +191,7 @@ export function BankAccounts() {
           <p className="text-sm text-slate-600">{t('bankAccounts.deleteConfirmation', { name: deletingAccount?.name ?? '' })}</p>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDeletingAccount(null)}>{t('common.cancel')}</Button>
-            <Button type="button" variant="destructive" onClick={handleDelete}>{t('common.delete')}</Button>
+              <Button type="button" variant="destructive" onClick={remove}>{t('common.delete')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

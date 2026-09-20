@@ -2,12 +2,26 @@ import * as React from 'react';
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from 'lucide-react';
 import { Select as SelectPrimitive } from 'radix-ui';
 
-import { cn } from '@/lib/Utils';
+import { cn } from '@/lib/utils';
 
 function Select({
+  name,
+  onValueChange,
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Root>) {
-  return <SelectPrimitive.Root data-slot="select" {...props} />
+  return (
+    <SelectPrimitive.Root
+      data-slot="select"
+      {...props}
+      name={name}
+      onValueChange={(value) => {
+        onValueChange?.(value);
+        if (name) {
+          document.querySelector<HTMLSelectElement>(`select[name="${name}"]`)?.setCustomValidity('');
+        }
+      }}
+    />
+  )
 }
 
 function SelectGroup({

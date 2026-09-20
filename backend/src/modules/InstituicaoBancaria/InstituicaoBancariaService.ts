@@ -2,6 +2,7 @@ import { ErroAplicacao } from '../../shared/errors/AppError';
 import { env } from '../../config/Env';
 import { InstituicaoBancariaRepository } from './InstituicaoBancariaRepository';
 import type { InstituicaoBancaria, InstituicaoBancariaInput } from './InstituicaoBancariaTypes';
+import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class InstituicaoBancariaService {
     constructor(private readonly repository = new InstituicaoBancariaRepository(env.contaId)) {}
@@ -64,11 +65,3 @@ export class InstituicaoBancariaService {
         }
     }
 }
-
-interface PostgresError {
-    code?: string;
-}
-
-const isPostgresError = (error: unknown): error is PostgresError => (
-    typeof error === 'object' && error !== null && 'code' in error
-);

@@ -7,6 +7,7 @@ import { instituicaoBancariaRoutes } from './modules/InstituicaoBancaria/Institu
 import { contaBancariaRoutes } from './modules/ContaBancaria/ContaBancariaRoutes';
 import { cartaoCreditoRoutes } from './modules/CartaoCredito/CartaoCreditoRoutes';
 import { categoriaRoutes } from './modules/Categoria/CategoriaRoutes';
+import { transacaoRoutes } from './modules/Transacao/TransacaoRoutes';
 
 export const app = express();
 
@@ -31,4 +32,5 @@ app.use('/api/instituicao-bancaria', instituicaoBancariaRoutes);
 app.use('/api/conta-bancaria', contaBancariaRoutes);
 app.use('/api/cartao-credito', cartaoCreditoRoutes);
 app.use('/api/categorias', categoriaRoutes);
+app.use('/api/transacoes', transacaoRoutes);
 app.use(errorHandler);

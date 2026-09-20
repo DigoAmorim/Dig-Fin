@@ -1,6 +1,7 @@
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { env } from '../../config/Env';
 import { BandeiraCartaoRepository } from './BandeiraCartaoRepository';
+import { isPostgresError } from '../../shared/database/PostgresError';
 import type { BandeiraCartao, BandeiraCartaoInput } from './BandeiraCartaoTypes';
 
 export class BandeiraCartaoService {
@@ -64,11 +65,3 @@ export class BandeiraCartaoService {
         }
     }
 }
-
-interface PostgresError {
-    code?: string;
-}
-
-const isPostgresError = (error: unknown): error is PostgresError => (
-    typeof error === 'object' && error !== null && 'code' in error
-);

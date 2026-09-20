@@ -1,120 +1,92 @@
 import { type FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { toast } from 'sonner';
-import { cartaoCreditoApi, CartaoCreditoApiError } from '../lib/CartaoCreditoApi.ts';
-import { translateApiError } from '../lib/ApiError.ts';
-import { bandeiraCartaoApi } from '../lib/BandeiraCartaoApi.ts';
-import type { CartaoCredito } from '../types/CartaoCredito.ts';
-import type { BandeiraCartao } from '../types/BandeiraCartao.ts';
-import { Button } from '../components/ui/Button.tsx';
-import { Input } from '../components/ui/Input.tsx';
-import { Label } from '../components/ui/Label.tsx';
+import { cartaoCreditoApi } from '../lib/cartao-credito-api.ts';
+import { bandeiraCartaoApi } from '../lib/bandeira-cartao-api.ts';
+import type { CartaoCredito, CartaoCreditoInput } from '../types/cartao-credito.ts';
+import type { BandeiraCartao } from '../types/bandeira-cartao.ts';
+import { useCrudResource } from '../hooks/use-crud-resource.ts';
+import { Button } from '../components/ui/button.tsx';
+import { Input } from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../components/ui/Select.tsx';
+} from '../components/ui/select.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
+} from '../components/ui/dialog.tsx';
+import { PageHeader } from '../components/page-header.tsx';
+
+const sortCreditCards = (items: CartaoCredito[]) => [...items].sort((a, b) => a.name.localeCompare(b.name));
 
 const dueDays = Array.from({ length: 31 }, (_, index) => index + 1);
 
 export function CreditCards() {
   const { t } = useTranslation();
-  const [cards, setCards] = useState<CartaoCredito[]>([]);
   const [brands, setBrands] = useState<BandeiraCartao[]>([]);
+  const [brandsError, setBrandsError] = useState('');
   const [name, setName] = useState('');
   const [cardBrandId, setCardBrandId] = useState('');
   const [dueDay, setDueDay] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingCard, setEditingCard] = useState<CartaoCredito | null>(null);
-  const [deletingCard, setDeletingCard] = useState<CartaoCredito | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [formError, setFormError] = useState('');
-  const [error, setError] = useState('');
+  const {
+    items: cards,
+    editingItem: editingCard,
+    deletingItem: deletingCard,
+    isFormOpen,
+    isLoading,
+    error,
+    formError,
+    setDeletingItem: setDeletingCard,
+    openCreate,
+    openEdit,
+    closeForm,
+    save,
+    remove,
+  } = useCrudResource<CartaoCredito, CartaoCreditoInput>({
+    api: cartaoCreditoApi,
+    loadErrorMessage: t('creditCards.loadError'),
+    createdMessage: t('creditCards.created'),
+    updatedMessage: t('creditCards.updated'),
+    deletedMessage: t('creditCards.deleted'),
+    sortItems: sortCreditCards,
+  });
 
   useEffect(() => {
-    Promise.all([cartaoCreditoApi.list(), bandeiraCartaoApi.list()])
-      .then(([loadedCards, loadedBrands]) => {
-        setCards(loadedCards);
-        setBrands(loadedBrands);
-      })
-      .catch(() => setError(t('creditCards.loadError')))
-      .finally(() => setIsLoading(false));
+    bandeiraCartaoApi.list()
+      .then(setBrands)
+      .catch(() => setBrandsError(t('creditCards.loadError')));
   }, [t]);
 
   const resetForm = () => {
     setName('');
     setCardBrandId('');
     setDueDay('');
-    setFormError('');
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFormError('');
-    try {
-      const input = {
-        name,
-        cardBrandId,
-        dueDay: Number(dueDay),
-      };
-      const saved = editingCard
-        ? await cartaoCreditoApi.update(editingCard.id, input)
-        : await cartaoCreditoApi.create(input);
-      setCards((current) => {
-        const next = editingCard
-          ? current.map((card) => card.id === saved.id ? saved : card)
-          : [...current, saved];
-        return next.sort((first, second) => first.name.localeCompare(second.name));
-      });
-      setIsFormOpen(false);
-      setEditingCard(null);
-      resetForm();
-      toast.success(editingCard ? t('creditCards.updated') : t('creditCards.created'));
-    } catch (submissionError) {
-      if (submissionError instanceof CartaoCreditoApiError) {
-        setFormError(translateApiError(submissionError));
-        return;
-      }
-      setFormError(translateApiError(submissionError));
-    }
+    const saved = await save({ name, cardBrandId, dueDay: Number(dueDay) });
+    if (saved) resetForm();
   };
 
   const openCreateDialog = () => {
-    setEditingCard(null);
     resetForm();
-    setIsFormOpen(true);
+    openCreate();
   };
 
   const openEditDialog = (card: CartaoCredito) => {
-    setEditingCard(card);
     setName(card.name);
     setCardBrandId(card.cardBrandId);
     setDueDay(String(card.dueDay));
-    setFormError('');
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingCard) return;
-    try {
-      await cartaoCreditoApi.remove(deletingCard.id);
-      setCards((current) => current.filter((card) => card.id !== deletingCard.id));
-      setDeletingCard(null);
-      toast.success(t('creditCards.deleted'));
-    } catch (deletionError) {
-      toast.error(translateApiError(deletionError));
-    }
+    openEdit(card);
   };
 
   return (
@@ -122,11 +94,7 @@ export function CreditCards() {
       <PageHeader section={t('creditCards.section')} title={t('creditCards.title')} />
 
       <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open) {
-          setEditingCard(null);
-          resetForm();
-        }
+        if (!open) { closeForm(); resetForm(); }
       }}>
         <DialogContent>
           <DialogHeader>
@@ -187,14 +155,14 @@ export function CreditCards() {
             </div>
             {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsFormOpen(false)}>{t('common.cancel')}</Button>
+              <Button type="button" variant="outline" onClick={() => { closeForm(); resetForm(); }}>{t('common.cancel')}</Button>
               <Button type="submit">{t('common.save')}</Button>
             </DialogFooter>
           </form>
         </DialogContent>
       </Dialog>
 
-      {error && <p className="text-sm text-rose-600">{error}</p>}
+      {(error || brandsError) && <p className="text-sm text-rose-600">{error || brandsError}</p>}
 
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
@@ -242,7 +210,7 @@ export function CreditCards() {
           <p className="text-sm text-slate-600">{t('creditCards.deleteConfirmation', { name: deletingCard?.name ?? '' })}</p>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setDeletingCard(null)}>{t('common.cancel')}</Button>
-            <Button type="button" variant="destructive" onClick={handleDelete}>{t('common.delete')}</Button>
+            <Button type="button" variant="destructive" onClick={remove}>{t('common.delete')}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -16,7 +16,7 @@ const contaBancariaSelect = `
         cb.instituicao_bancaria_id::text AS "bankInstitutionId",
         ib.nome AS "bankInstitutionName"
     FROM digfin.conta_bancaria cb
-    INNER JOIN digfin.instituicao_bancaria ib ON ib.id = cb.instituicao_bancaria_id
+    INNER JOIN digfin.instituicao_bancaria ib ON ib.id = cb.instituicao_bancaria_id AND ib.conta_id = cb.conta_id
 `;
 
 export class ContaBancariaRepository {
@@ -43,7 +43,7 @@ export class ContaBancariaRepository {
                     id::text AS id,
                     nome AS name,
                     instituicao_bancaria_id::text AS "bankInstitutionId",
-                    (SELECT nome FROM digfin.instituicao_bancaria WHERE id = instituicao_bancaria_id) AS "bankInstitutionName"
+                    (SELECT nome FROM digfin.instituicao_bancaria WHERE id = instituicao_bancaria_id AND conta_id = $1) AS "bankInstitutionName"
             `,
             [this.contaId, input.bankInstitutionId, input.name],
         );
@@ -68,7 +68,7 @@ export class ContaBancariaRepository {
                     cb.id::text AS id,
                     cb.nome AS name,
                     cb.instituicao_bancaria_id::text AS "bankInstitutionId",
-                    (SELECT nome FROM digfin.instituicao_bancaria WHERE id = cb.instituicao_bancaria_id) AS "bankInstitutionName"
+                    (SELECT nome FROM digfin.instituicao_bancaria WHERE id = cb.instituicao_bancaria_id AND conta_id = $4) AS "bankInstitutionName"
             `,
             [input.name, input.bankInstitutionId, id, this.contaId],
         );

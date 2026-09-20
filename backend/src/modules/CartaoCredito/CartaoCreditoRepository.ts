@@ -18,7 +18,7 @@ const cartaoCreditoSelect = `
         bc.descricao AS "cardBrandDescription",
         cc.dia_vencimento AS "dueDay"
     FROM digfin.cartao_credito cc
-    INNER JOIN digfin.bandeira_cartao bc ON bc.id = cc.bandeira_cartao_id
+    INNER JOIN digfin.bandeira_cartao bc ON bc.id = cc.bandeira_cartao_id AND bc.conta_id = cc.conta_id
 `;
 
 export class CartaoCreditoRepository {
@@ -45,7 +45,7 @@ export class CartaoCreditoRepository {
                     id::text AS id,
                     nome AS name,
                     bandeira_cartao_id::text AS "cardBrandId",
-                    (SELECT descricao FROM digfin.bandeira_cartao WHERE id = bandeira_cartao_id) AS "cardBrandDescription",
+                    (SELECT descricao FROM digfin.bandeira_cartao WHERE id = bandeira_cartao_id AND conta_id = $1) AS "cardBrandDescription",
                     dia_vencimento AS "dueDay"
             `,
             [this.contaId, input.cardBrandId, input.name, input.dueDay],
@@ -72,7 +72,7 @@ export class CartaoCreditoRepository {
                     cc.id::text AS id,
                     cc.nome AS name,
                     cc.bandeira_cartao_id::text AS "cardBrandId",
-                    (SELECT descricao FROM digfin.bandeira_cartao WHERE id = cc.bandeira_cartao_id) AS "cardBrandDescription",
+                    (SELECT descricao FROM digfin.bandeira_cartao WHERE id = cc.bandeira_cartao_id AND conta_id = $5) AS "cardBrandDescription",
                     cc.dia_vencimento AS "dueDay"
             `,
             [input.name, input.cardBrandId, input.dueDay, id, this.contaId],

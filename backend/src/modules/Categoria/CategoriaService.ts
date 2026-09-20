@@ -2,6 +2,7 @@ import { env } from '../../config/Env';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { CategoriaRepository } from './CategoriaRepository';
 import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from './CategoriaTypes';
+import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class CategoriaService {
     constructor(private readonly repository = new CategoriaRepository(env.contaId)) {}
@@ -113,9 +114,3 @@ export class CategoriaService {
         if (isPostgresError(error) && error.code === '23505') throw new ErroAplicacao(409, code);
     }
 }
-
-interface PostgresError { code?: string; }
-
-const isPostgresError = (error: unknown): error is PostgresError => (
-    typeof error === 'object' && error !== null && 'code' in error
-);

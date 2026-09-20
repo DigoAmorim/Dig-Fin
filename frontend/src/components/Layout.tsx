@@ -1,16 +1,17 @@
-import React, { type ReactNode } from 'react';
-import { Sidebar } from './Sidebar'; // Assumindo que este arquivo existe
-import { Header } from './Header';
+import { type ReactNode } from 'react';
+import { Sidebar } from './sidebar'; // Assumindo que este arquivo existe
+import { Header } from './header';
+import type { PageKey } from '../config/navigation';
 
 // O Layout precisa saber o título da página atual e qual conteúdo renderizar no meio
 interface LayoutProps {
   title: string;
-  activePage: string;
-  setActivePage: (page: string) => void;
+  activePage: PageKey;
+  setActivePage: (page: PageKey) => void;
   children: ReactNode; // 'ReactNode' é o tipo para qualquer coisa que o React possa renderizar na tela
 }
 
-export const Layout: React.FC<LayoutProps> = ({ title, activePage, setActivePage, children }) => {
+export function Layout({ title, activePage, setActivePage, children }: LayoutProps) {
   return (
     <div className="flex h-screen bg-slate-100 text-slate-800 font-sans antialiased overflow-hidden">
       
@@ -32,4 +33,4 @@ export const Layout: React.FC<LayoutProps> = ({ title, activePage, setActivePage
       </div>
     </div>
   );
-};
+}

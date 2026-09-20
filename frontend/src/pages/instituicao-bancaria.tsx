@@ -1,94 +1,63 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { InstituicaoBancariaApiError, instituicaoBancariaApi } from '../lib/InstituicaoBancariaApi.ts';
-import { translateApiError } from '../lib/ApiError.ts';
-import type { InstituicaoBancaria } from '../types/InstituicaoBancaria.ts';
-import { Button } from '../components/ui/Button.tsx';
-import { Input } from '../components/ui/Input.tsx';
-import { Label } from '../components/ui/Label.tsx';
+import { instituicaoBancariaApi } from '../lib/instituicao-bancaria-api.ts';
+import type { InstituicaoBancaria, InstituicaoBancariaInput } from '../types/instituicao-bancaria.ts';
+import { useCrudResource } from '../hooks/use-crud-resource.ts';
+import { Button } from '../components/ui/button.tsx';
+import { Input } from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
+} from '../components/ui/dialog.tsx';
+import { PageHeader } from '../components/page-header.tsx';
+
+const sortInstitutions = (items: InstituicaoBancaria[]) => [...items].sort((a, b) => a.name.localeCompare(b.name));
 
 export function BankInstitutions() {
   const { t } = useTranslation();
-  const [institutions, setInstitutions] = useState<InstituicaoBancaria[]>([]);
   const [name, setName] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingInstitution, setEditingInstitution] = useState<InstituicaoBancaria | null>(null);
-  const [deletingInstitution, setDeletingInstitution] = useState<InstituicaoBancaria | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [formError, setFormError] = useState('');
-
-  useEffect(() => {
-    instituicaoBancariaApi.list()
-      .then(setInstitutions)
-      .catch(() => setError(t('bankInstitutions.loadError')))
-      .finally(() => setIsLoading(false));
-  }, [t]);
+  const {
+    items: institutions,
+    editingItem: editingInstitution,
+    deletingItem: deletingInstitution,
+    isFormOpen,
+    isLoading,
+    error,
+    formError,
+    setDeletingItem: setDeletingInstitution,
+    openCreate,
+    openEdit,
+    closeForm,
+    save,
+    remove,
+  } = useCrudResource<InstituicaoBancaria, InstituicaoBancariaInput>({
+    api: instituicaoBancariaApi,
+    loadErrorMessage: t('bankInstitutions.loadError'),
+    createdMessage: t('bankInstitutions.created'),
+    updatedMessage: t('bankInstitutions.updated'),
+    deletedMessage: t('bankInstitutions.deleted'),
+    sortItems: sortInstitutions,
+  });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFormError('');
-    try {
-      const saved = editingInstitution
-        ? await instituicaoBancariaApi.update(editingInstitution.id, { name })
-        : await instituicaoBancariaApi.create({ name });
-
-      setInstitutions((current) => {
-        const next = editingInstitution
-          ? current.map((institution) => institution.id === saved.id ? saved : institution)
-          : [...current, saved];
-        return next.sort((a, b) => a.name.localeCompare(b.name));
-      });
-
-      setName('');
-      setIsFormOpen(false);
-      setEditingInstitution(null);
-      toast.success(editingInstitution ? t('bankInstitutions.updated') : t('bankInstitutions.created'));
-    } catch (submissionError) {
-      if (submissionError instanceof InstituicaoBancariaApiError) {
-        setFormError(translateApiError(submissionError));
-        return;
-      }
-      setFormError(translateApiError(submissionError));
-    }
+    const saved = await save({ name });
+    if (saved) setName('');
   };
 
   const openCreateDialog = () => {
-    setEditingInstitution(null);
     setName('');
-    setFormError('');
-    setIsFormOpen(true);
+    openCreate();
   };
 
   const openEditDialog = (institution: InstituicaoBancaria) => {
-    setEditingInstitution(institution);
     setName(institution.name);
-    setFormError('');
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingInstitution) return;
-
-    try {
-      await instituicaoBancariaApi.remove(deletingInstitution.id);
-      setInstitutions((current) => current.filter((institution) => institution.id !== deletingInstitution.id));
-      setDeletingInstitution(null);
-      setError('');
-      toast.success(t('bankInstitutions.deleted'));
-    } catch (deletionError) {
-      toast.error(translateApiError(deletionError));
-    }
+    openEdit(institution);
   };
 
   return (
@@ -96,11 +65,7 @@ export function BankInstitutions() {
       <PageHeader section={t('bankInstitutions.section')} title={t('bankInstitutions.title')} />
 
       <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open) {
-          setEditingInstitution(null);
-          setFormError('');
-        }
+        if (!open) closeForm();
       }}>
         <DialogContent>
           <DialogHeader>
@@ -133,7 +98,7 @@ export function BankInstitutions() {
               </p>
             )}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => { setIsFormOpen(false); setEditingInstitution(null); setFormError(''); }}>
+              <Button type="button" variant="outline" onClick={closeForm}>
                 {t('common.cancel')}
               </Button>
               <Button type="submit">{t('common.save')}</Button>
@@ -208,7 +173,7 @@ export function BankInstitutions() {
             <Button type="button" variant="outline" onClick={() => setDeletingInstitution(null)}>
               {t('common.cancel')}
             </Button>
-            <Button type="button" variant="destructive" onClick={handleDelete}>
+              <Button type="button" variant="destructive" onClick={remove}>
               {t('common.delete')}
             </Button>
           </DialogFooter>

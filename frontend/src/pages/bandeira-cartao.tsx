@@ -1,92 +1,64 @@
-import { type FormEvent, useEffect, useState } from 'react';
+import { type FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
-import { BandeiraCartaoApiError, bandeiraCartaoApi } from '../lib/BandeiraCartaoApi.ts';
-import { translateApiError } from '../lib/ApiError.ts';
-import type { BandeiraCartao } from '../types/BandeiraCartao.ts';
-import { Button } from '../components/ui/Button.tsx';
-import { Input } from '../components/ui/Input.tsx';
-import { Label } from '../components/ui/Label.tsx';
+import { bandeiraCartaoApi } from '../lib/bandeira-cartao-api.ts';
+import type { BandeiraCartao } from '../types/bandeira-cartao.ts';
+import type { BandeiraCartaoInput } from '../types/bandeira-cartao.ts';
+import { useCrudResource } from '../hooks/use-crud-resource.ts';
+import { Button } from '../components/ui/button.tsx';
+import { Input } from '../components/ui/input.tsx';
+import { Label } from '../components/ui/label.tsx';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
-import { PageHeader } from '../components/PageHeader.tsx';
+} from '../components/ui/dialog.tsx';
+import { PageHeader } from '../components/page-header.tsx';
+
+const sortCardBrands = (items: BandeiraCartao[]) => [...items].sort((a, b) => a.description.localeCompare(b.description));
 
 export function CardBrands() {
   const { t } = useTranslation();
-  const [cardBrands, setCardBrands] = useState<BandeiraCartao[]>([]);
   const [description, setDescription] = useState('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
-  const [editingBrand, setEditingBrand] = useState<BandeiraCartao | null>(null);
-  const [deletingBrand, setDeletingBrand] = useState<BandeiraCartao | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [formError, setFormError] = useState('');
-
-  useEffect(() => {
-    bandeiraCartaoApi.list()
-      .then(setCardBrands)
-      .catch(() => setError(t('cardBrands.loadError')))
-      .finally(() => setIsLoading(false));
-  }, [t]);
+  const {
+    items: cardBrands,
+    editingItem: editingBrand,
+    deletingItem: deletingBrand,
+    isFormOpen,
+    isLoading,
+    error,
+    formError,
+    setDeletingItem: setDeletingBrand,
+    openCreate,
+    openEdit,
+    closeForm,
+    save,
+    remove,
+  } = useCrudResource<BandeiraCartao, BandeiraCartaoInput>({
+    api: bandeiraCartaoApi,
+    loadErrorMessage: t('cardBrands.loadError'),
+    createdMessage: t('cardBrands.created'),
+    updatedMessage: t('cardBrands.updated'),
+    deletedMessage: t('cardBrands.deleted'),
+    sortItems: sortCardBrands,
+  });
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setFormError('');
-    try {
-      const saved = editingBrand
-        ? await bandeiraCartaoApi.update(editingBrand.id, { description })
-        : await bandeiraCartaoApi.create({ description });
-      setCardBrands((current) => {
-        const next = editingBrand
-          ? current.map((brand) => brand.id === saved.id ? saved : brand)
-          : [...current, saved];
-        return next.sort((a, b) => a.description.localeCompare(b.description));
-      });
-      setDescription('');
-      setIsFormOpen(false);
-      setEditingBrand(null);
-      toast.success(editingBrand ? t('cardBrands.updated') : t('cardBrands.created'));
-    } catch (submissionError) {
-      if (submissionError instanceof BandeiraCartaoApiError) {
-        setFormError(translateApiError(submissionError));
-        return;
-      }
-      setFormError(translateApiError(submissionError));
-    }
+    const saved = await save({ description });
+    if (saved) setDescription('');
   };
 
   const openCreateDialog = () => {
-    setEditingBrand(null);
     setDescription('');
-    setFormError('');
-    setIsFormOpen(true);
+    openCreate();
   };
 
   const openEditDialog = (brand: BandeiraCartao) => {
-    setEditingBrand(brand);
     setDescription(brand.description);
-    setFormError('');
-    setIsFormOpen(true);
-  };
-
-  const handleDelete = async () => {
-    if (!deletingBrand) return;
-
-    try {
-      await bandeiraCartaoApi.remove(deletingBrand.id);
-      setCardBrands((current) => current.filter((brand) => brand.id !== deletingBrand.id));
-      setDeletingBrand(null);
-      setError('');
-      toast.success(t('cardBrands.deleted'));
-    } catch (deletionError) {
-      toast.error(translateApiError(deletionError));
-    }
+    openEdit(brand);
   };
 
   return (
@@ -94,11 +66,7 @@ export function CardBrands() {
       <PageHeader section={t('cardBrands.section')} title={t('cardBrands.title')} />
 
       <Dialog open={isFormOpen} onOpenChange={(open) => {
-        setIsFormOpen(open);
-        if (!open) {
-          setEditingBrand(null);
-          setFormError('');
-        }
+        if (!open) closeForm();
       }}>
         <DialogContent>
           <DialogHeader>
@@ -131,7 +99,7 @@ export function CardBrands() {
               </p>
             )}
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => { setIsFormOpen(false); setEditingBrand(null); setFormError(''); }}>
+              <Button type="button" variant="outline" onClick={closeForm}>
                 {t('common.cancel')}
               </Button>
               <Button type="submit">{t('common.save')}</Button>
@@ -205,7 +173,7 @@ export function CardBrands() {
             <Button type="button" variant="outline" onClick={() => setDeletingBrand(null)}>
               {t('common.cancel')}
             </Button>
-            <Button type="button" variant="destructive" onClick={handleDelete}>
+              <Button type="button" variant="destructive" onClick={remove}>
               {t('common.delete')}
             </Button>
           </DialogFooter>

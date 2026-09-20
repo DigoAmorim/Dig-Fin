@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, type HTMLAttributes, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
-import { Button } from './Button.tsx';
+import { Button } from './button.tsx';
 
 interface DialogContextValue {
   open: boolean;
