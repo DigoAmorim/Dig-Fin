@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { addMonths, format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ChevronLeft, ChevronRight, Plus, Receipt, WalletCards } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Plus, Receipt, WalletCards } from 'lucide-react';
 import { toast } from 'sonner';
 import { categoriaApi } from '../lib/categoria-api.ts';
 import { cartaoCreditoApi } from '../lib/cartao-credito-api.ts';
@@ -23,6 +23,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { PageHeader } from '../components/page-header.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover.tsx';
 import { MonthPicker } from '../components/ui/month-picker.tsx';
+import { type TransacoesColumnId, useTransacoesGridState } from '../components/transacoes-grid-columns.tsx';
 
 type TransactionType = 'expense' | 'income' | 'transfer';
 interface ExpenseFormState {
@@ -75,6 +76,7 @@ export function Transacoes() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [formError, setFormError] = useState('');
+  const grid = useTransacoesGridState();
 
   useEffect(() => {
     Promise.all([transacaoApi.list(), categoriaApi.list(), contaBancariaApi.list(), cartaoCreditoApi.list()])
@@ -91,10 +93,48 @@ export function Transacoes() {
       .finally(() => setIsLoading(false));
   }, [t]);
 
-  const monthTransactions = useMemo(
-    () => transactions.filter((transaction) => transaction.competenceDate.slice(0, 7) === month).sort((a, b) => a.competenceDate.localeCompare(b.competenceDate)),
-    [month, transactions],
-  );
+  const monthTransactions = useMemo(() => {
+    const filtered = transactions.filter((transaction) => transaction.competenceDate.slice(0, 7) === month);
+    const direction = grid.sortDir === 'asc' ? 1 : -1;
+
+    return filtered.sort((first, second) => {
+      let comparison = 0;
+      switch (grid.sortBy) {
+        case 'description':
+          comparison = first.description.localeCompare(second.description, 'pt-BR');
+          break;
+        case 'account':
+          comparison = (first.accountName ?? '').localeCompare(second.accountName ?? '', 'pt-BR');
+          break;
+        case 'card':
+          comparison = (first.cardName ?? '').localeCompare(second.cardName ?? '', 'pt-BR');
+          break;
+        case 'installment':
+          comparison = first.installment - second.installment || first.installments - second.installments;
+          break;
+        case 'subcategory':
+          comparison = (first.subcategoryName ?? '').localeCompare(second.subcategoryName ?? '', 'pt-BR');
+          break;
+        case 'amount':
+          comparison = first.amount - second.amount;
+          break;
+        case 'date':
+        case null:
+          comparison = first.competenceDate.localeCompare(second.competenceDate);
+          break;
+      }
+      return comparison * direction || first.id.localeCompare(second.id);
+    });
+  }, [grid.sortBy, grid.sortDir, month, transactions]);
+
+  const renderSortIcon = (column: TransacoesColumnId) => {
+    if (grid.sortBy !== column) return null;
+    return grid.sortDir === 'asc'
+      ? <ArrowUp size={13} aria-hidden="true" />
+      : <ArrowDown size={13} aria-hidden="true" />;
+  };
+
+  const sortableHeaderClass = 'inline-flex cursor-pointer items-center gap-1 hover:text-slate-900';
 
   const monthSummary = useMemo(() => monthTransactions.reduce(
     (summary, transaction) => {
@@ -294,7 +334,15 @@ export function Transacoes() {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4"><div><h2 className="text-sm font-semibold text-slate-800">{t('transactions.launches')}</h2><p className="mt-1 text-xs text-slate-500">{isLoading ? t('common.loading') : `${monthTransactions.length} ${t('transactions.found')}`}</p></div><Receipt size={20} className="text-slate-300" /></div>
         {isLoading && <p className="px-5 py-6 text-sm text-slate-500">{t('common.loading')}</p>}
-        {monthTransactions.length === 0 ? <div className="flex flex-col items-center gap-2 px-5 py-12 text-center"><WalletCards size={30} className="text-slate-300" /><p className="text-sm text-slate-500">{t('transactions.empty')}</p></div> : <Table><TableHeader><TableRow className="bg-slate-50"><TableHead>{t('transactions.launchDateColumn')}</TableHead><TableHead>{t('transactions.descriptionColumn')}</TableHead><TableHead>{t('transactions.accountColumn')}</TableHead><TableHead>{t('transactions.cardColumn')}</TableHead><TableHead>{t('transactions.installmentColumn')}</TableHead><TableHead>{t('transactions.subcategoryColumn')}</TableHead><TableHead className="text-right">{t('transactions.amountColumn')}</TableHead></TableRow></TableHeader><TableBody>{monthTransactions.map((transaction) => <TableRow key={transaction.id} className="border-slate-100"><TableCell className="text-slate-500">{formatDate(transaction.date)}</TableCell><TableCell className="font-medium text-slate-800">{transaction.description}</TableCell><TableCell className="text-slate-500">{transaction.accountName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.cardName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.installment}/{transaction.installments}</TableCell><TableCell className="text-slate-600">{transaction.subcategoryName}</TableCell><TableCell className={`text-right font-mono font-semibold ${valueColorClass(transaction.amount)}`}>{formatCurrency(transaction.amount)}</TableCell></TableRow>)}</TableBody></Table>}
+        {monthTransactions.length === 0 ? <div className="flex flex-col items-center gap-2 px-5 py-12 text-center"><WalletCards size={30} className="text-slate-300" /><p className="text-sm text-slate-500">{t('transactions.empty')}</p></div> : <Table><TableHeader><TableRow className="bg-slate-50">
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('date')}>{t('transactions.launchDateColumn')}{renderSortIcon('date')}</button></TableHead>
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('description')}>{t('transactions.descriptionColumn')}{renderSortIcon('description')}</button></TableHead>
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('account')}>{t('transactions.accountColumn')}{renderSortIcon('account')}</button></TableHead>
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('card')}>{t('transactions.cardColumn')}{renderSortIcon('card')}</button></TableHead>
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('installment')}>{t('transactions.installmentColumn')}{renderSortIcon('installment')}</button></TableHead>
+          <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('subcategory')}>{t('transactions.subcategoryColumn')}{renderSortIcon('subcategory')}</button></TableHead>
+          <TableHead className="text-right"><button type="button" className={`ml-auto ${sortableHeaderClass}`} onClick={() => grid.toggleSort('amount')}>{t('transactions.amountColumn')}{renderSortIcon('amount')}</button></TableHead>
+        </TableRow></TableHeader><TableBody>{monthTransactions.map((transaction) => <TableRow key={transaction.id} className="border-slate-100"><TableCell className="text-slate-500">{formatDate(transaction.date)}</TableCell><TableCell className="font-medium text-slate-800">{transaction.description}</TableCell><TableCell className="text-slate-500">{transaction.accountName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.cardName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.installment}/{transaction.installments}</TableCell><TableCell className="text-slate-600">{transaction.subcategoryName}</TableCell><TableCell className={`text-right font-mono font-semibold ${valueColorClass(transaction.amount)}`}>{formatCurrency(transaction.amount)}</TableCell></TableRow>)}</TableBody></Table>}
       </div>
     </div>
   );
