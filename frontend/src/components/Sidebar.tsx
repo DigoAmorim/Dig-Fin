@@ -8,6 +8,7 @@ import {
   Search,
   Tags,
   Target,
+  Receipt,
   Wallet,
 } from 'lucide-react';
 
@@ -79,6 +80,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage }) =
             >
               <ArrowRightLeft className="w-4 h-4" />
               Visão Geral
+            </button>
+            <button
+              onClick={() => setActivePage('transactions')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'transactions'
+                  ? 'bg-emerald-50 text-emerald-700 font-medium'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Receipt className="w-4 h-4" />
+              Transações
             </button>
 
           </nav>}

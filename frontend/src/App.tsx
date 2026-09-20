@@ -9,6 +9,7 @@ const BankInstitutions = lazy(() => import('./pages/InstituicaoBancaria').then((
 const BankAccounts = lazy(() => import('./pages/ContaBancaria').then(({ BankAccounts }) => ({ default: BankAccounts })));
 const CreditCards = lazy(() => import('./pages/CartaoCredito').then(({ CreditCards }) => ({ default: CreditCards })));
 const Categories = lazy(() => import('./pages/Categorias').then(({ Categories }) => ({ default: Categories })));
+const Transacoes = lazy(() => import('./pages/Transacoes').then(({ Transacoes }) => ({ default: Transacoes })));
 
 function App() {
   const { t } = useTranslation();
@@ -18,12 +19,13 @@ function App() {
   return (
     <>
       <Layout
-        title={activePage === 'dashboard' ? t('navigation.overview') : activePage === 'card-brands' ? t('navigation.cardBrands') : activePage === 'bank-institutions' ? t('navigation.bankInstitutions') : activePage === 'bank-accounts' ? t('navigation.bankAccounts') : activePage === 'credit-cards' ? t('navigation.creditCards') : activePage === 'categories' ? t('navigation.categories') : activePage}
+        title={activePage === 'dashboard' ? t('navigation.overview') : activePage === 'transactions' ? t('navigation.transactions') : activePage === 'card-brands' ? t('navigation.cardBrands') : activePage === 'bank-institutions' ? t('navigation.bankInstitutions') : activePage === 'bank-accounts' ? t('navigation.bankAccounts') : activePage === 'credit-cards' ? t('navigation.creditCards') : activePage === 'categories' ? t('navigation.categories') : activePage}
         activePage={activePage}
         setActivePage={setActivePage}
       >
         <Suspense fallback={<p className="text-sm text-slate-500">{t('common.loading')}</p>}>
           {activePage === 'dashboard' && <Dashboard />}
+          {activePage === 'transactions' && <Transacoes />}
           {activePage === 'card-brands' && <CardBrands />}
           {activePage === 'bank-institutions' && <BankInstitutions />}
           {activePage === 'bank-accounts' && <BankAccounts />}

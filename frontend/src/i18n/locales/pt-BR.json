@@ -12,6 +12,7 @@
   },
   "navigation": {
     "overview": "Visão Geral",
+    "transactions": "Transações",
     "cardBrands": "Bandeira do Cartão",
     "bankInstitutions": "Instituição Bancária",
     "bankAccounts": "Conta Bancária",
