@@ -35,12 +35,14 @@ interface CategoryFormState {
   icon: string;
 }
 
-interface SubcategoryFormState extends CategoryFormState {
+interface SubcategoryFormState {
+  name: string;
+  icon: string;
   categoryId: string;
 }
 
 const emptyCategoryForm: CategoryFormState = { name: '', color: '#0f766e', icon: 'circle-help' };
-const emptySubcategoryForm: SubcategoryFormState = { name: '', color: '#2563eb', icon: 'circle-help', categoryId: '' };
+const emptySubcategoryForm: SubcategoryFormState = { name: '', icon: 'circle-help', categoryId: '' };
 
 export function Categories() {
   const { t } = useTranslation();
@@ -89,7 +91,7 @@ export function Categories() {
   const openSubcategoryDialog = (subcategory: Subcategoria | null, categoryId?: number) => {
     setEditingSubcategory(subcategory);
     setSubcategoryForm(subcategory
-      ? { name: subcategory.name, color: subcategory.color, icon: subcategory.icon, categoryId: String(subcategory.categoryId ?? '') }
+      ? { name: subcategory.name, icon: subcategory.icon, categoryId: String(subcategory.categoryId ?? '') }
       : { ...emptySubcategoryForm, categoryId: categoryId ? String(categoryId) : '' });
     setFormError('');
     setSubcategoryDialogOpen(true);
@@ -123,7 +125,6 @@ export function Categories() {
     try {
       const input: SubcategoriaInput = {
         name: subcategoryForm.name,
-        color: subcategoryForm.color,
         icon: subcategoryForm.icon,
         categoryId: subcategoryForm.categoryId ? Number(subcategoryForm.categoryId) : null,
       };
@@ -246,7 +247,7 @@ export function Categories() {
                   </div>
                   {!collapsed && category.subcategories.map((subcategory) => (
                     <div key={subcategory.id} className="flex items-center gap-3 border-t border-slate-100 px-5 py-2.5 pl-12">
-                      {renderIcon(subcategory.icon, subcategory.color, 15)}
+                      {renderIcon(subcategory.icon, category.color, 15)}
                       <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{subcategory.name}</span>
                       <button type="button" onClick={() => openSubcategoryDialog(subcategory)} title={t('common.edit')} className="rounded-md p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Pencil size={13} /></button>
                       <button type="button" onClick={() => setDeletingSubcategory(subcategory)} title={t('common.delete')} className="rounded-md p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={13} /></button>
@@ -260,7 +261,7 @@ export function Categories() {
                 <div className="border-b border-slate-100 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-500">{t('subcategories.noCategory')}</div>
                 {ungroupedSubcategories.map((subcategory) => (
                   <div key={subcategory.id} className="flex items-center gap-3 border-b border-slate-100 px-5 py-2.5 pl-12 last:border-b-0">
-                    {renderIcon(subcategory.icon, subcategory.color, 15)}
+                    {renderIcon(subcategory.icon, '#64748b', 15)}
                     <span className="min-w-0 flex-1 truncate text-sm text-slate-700">{subcategory.name}</span>
                     <button type="button" onClick={() => openSubcategoryDialog(subcategory)} title={t('common.edit')} className="rounded-md p-1.5 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600"><Pencil size={13} /></button>
                     <button type="button" onClick={() => setDeletingSubcategory(subcategory)} title={t('common.delete')} className="rounded-md p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"><Trash2 size={13} /></button>
@@ -291,8 +292,7 @@ export function Categories() {
           <form onSubmit={handleSubcategorySubmit} className="space-y-4">
             <div className="space-y-2"><Label htmlFor="subcategory-name" required>{t('subcategories.name')}</Label><Input id="subcategory-name" value={subcategoryForm.name} onChange={(event) => setSubcategoryForm({ ...subcategoryForm, name: event.target.value })} required autoFocus /></div>
             <div className="space-y-2"><Label htmlFor="subcategory-category">{t('subcategories.category')}</Label><Select value={subcategoryForm.categoryId || undefined} onValueChange={(categoryId) => setSubcategoryForm({ ...subcategoryForm, categoryId: categoryId === 'none' ? '' : categoryId })}><SelectTrigger id="subcategory-category"><SelectValue placeholder={t('subcategories.noCategory')} /></SelectTrigger><SelectContent><SelectItem value="none">{t('subcategories.noCategory')}</SelectItem>{categories.map((category) => <SelectItem key={category.id} value={String(category.id)}>{category.name}</SelectItem>)}</SelectContent></Select></div>
-            <div className="space-y-2"><Label htmlFor="subcategory-color" required>{t('subcategories.color')}</Label><Input id="subcategory-color" type="color" value={subcategoryForm.color} onChange={(event) => setSubcategoryForm({ ...subcategoryForm, color: event.target.value })} className="h-9 px-2 py-1" required /></div>
-            <div className="space-y-2"><Label required>{t('subcategories.icon')}</Label><IconPicker value={subcategoryForm.icon} color={subcategoryForm.color} onChange={(icon) => setSubcategoryForm({ ...subcategoryForm, icon })} /></div>
+            <div className="space-y-2"><Label required>{t('subcategories.icon')}</Label><IconPicker value={subcategoryForm.icon} color="#64748b" onChange={(icon) => setSubcategoryForm({ ...subcategoryForm, icon })} /></div>
             {formError && <p role="alert" className="text-sm text-rose-600">{formError}</p>}
             <DialogFooter><Button type="button" variant="outline" onClick={closeDialogs}>{t('common.cancel')}</Button><Button type="submit">{t('common.save')}</Button></DialogFooter>
           </form>

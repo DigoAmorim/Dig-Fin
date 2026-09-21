@@ -2,7 +2,6 @@ export interface Subcategoria {
   id: number;
   categoryId: number | null;
   name: string;
-  color: string;
   icon: string;
 }
 
@@ -25,6 +24,8 @@ export interface CategoriaInput {
   icon: string;
 }
 
-export interface SubcategoriaInput extends CategoriaInput {
+export interface SubcategoriaInput {
   categoryId: number | null;
+  name: string;
+  icon: string;
 }

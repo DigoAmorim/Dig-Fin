@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Layout } from './components/layout';
 import { Dashboard } from './pages/dashboard';
 import { Toaster } from './components/ui/sonner';
-import { pageTitleKeys, type PageKey } from './config/navigation';
+import type { PageKey } from './config/navigation';
 
 const CardBrands = lazy(() => import('./pages/bandeira-cartao').then(({ CardBrands }) => ({ default: CardBrands })));
 const BankInstitutions = lazy(() => import('./pages/instituicao-bancaria').then(({ BankInstitutions }) => ({ default: BankInstitutions })));
@@ -19,7 +19,6 @@ function App() {
   return (
     <>
       <Layout
-        title={t(pageTitleKeys[activePage])}
         activePage={activePage}
         setActivePage={setActivePage}
       >

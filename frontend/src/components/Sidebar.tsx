@@ -6,7 +6,6 @@ import {
   ChevronDown,
   CreditCard,
   ChevronRight,
-  Search,
   Tags,
   Target,
   Receipt,
@@ -41,23 +40,14 @@ export function Sidebar({ activePage, setActivePage }: SidebarProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="w-7 h-7 rounded-lg bg-emerald-600 flex items-center justify-center font-bold text-white">
-              S
+              $
             </div>
-            <span className="font-semibold text-lg tracking-tight text-slate-900">Dig Fin</span>
+            <span className="font-semibold text-lg tracking-tight text-slate-900">DigFin</span>
           </div>
           <span className="text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded-full font-mono">
-            v0.15
+            v1.00
           </span>
         </div>
-
-        {/* Barra de Busca */}
-        <button className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-500 transition cursor-pointer">
-            <span className="flex items-center gap-2">
-            <Search className="w-3.5 h-3.5 text-slate-400" />
-              {t('common.search')}
-          </span>
-          <kbd className="bg-slate-200 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-600">Ctrl K</kbd>
-        </button>
 
         {/* Seção 1: ACCOUNTS */}
         <div>

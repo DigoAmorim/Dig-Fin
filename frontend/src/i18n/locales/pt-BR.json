@@ -258,6 +258,25 @@
     "description": "Descrição",
     "descriptionPlaceholder": "Ex.: Supermercado",
     "subcategory": "Subcategoria",
+    "filters": "Filtros",
+    "filterSearch": "Buscar por descrição, conta ou categoria...",
+    "filterType": "Tipo",
+    "filterAccount": "Conta",
+    "filterSubcategory": "Subcategoria",
+    "filterCategorySearch": "Buscar subcategoria...",
+    "filterNoResults": "Nenhuma subcategoria encontrada.",
+    "filterClearCategory": "Limpar categorias",
+    "filterClear": "Limpar filtros",
+    "filterRemove": "Remover filtro",
+    "activeFilters": "Filtros ativos",
+    "origins": {
+      "card": "Cartão",
+      "pix": "PIX",
+      "withdrawal": "Saque",
+      "card_refund": "Estorno do cartão",
+      "deposit": "Depósito",
+      "transfer": "Transferência"
+    },
     "subcategoryPlaceholder": "Selecione uma subcategoria",
     "origin": "Origem",
     "originPlaceholder": "Selecione uma origem",
@@ -307,5 +326,10 @@
     "subcategoryInvalid": "A subcategoria selecionada é inválida.",
     "saveError": "Não foi possível salvar a transação.",
     "transferSaveError": "Não foi possível salvar a transferência."
+    ,"deleteTitle": "Excluir transação?",
+    "deleteConfirmation": "Tem certeza que deseja excluir esta transação?",
+    "deleteTransferConfirmation": "Tem certeza que deseja excluir as duas partes desta transferência?",
+    "deleteLabel": "Excluir transação",
+    "deleted": "Transação excluída com sucesso."
   }
 }

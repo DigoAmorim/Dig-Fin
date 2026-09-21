@@ -85,7 +85,6 @@ export class CategoriaService {
         return {
             categoryId: categoryId ?? null,
             name: this.validateName(input?.name, 'subcategoryNameRequired', 'subcategoryNameTooLong'),
-            color: this.validateColor(input?.color),
             icon: this.validateIcon(input?.icon),
         };
     }

@@ -140,7 +140,6 @@ CREATE TABLE digfin.subcategoria (
     conta_id UUID NOT NULL,
     categoria_id BIGINT,
     nome VARCHAR(100) NOT NULL,
-    cor VARCHAR(7) NOT NULL,
     icone VARCHAR(50) NOT NULL,
     criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -160,8 +159,6 @@ CREATE TABLE digfin.subcategoria (
         FOREIGN KEY (categoria_id, conta_id)
         REFERENCES digfin.categoria(id, conta_id),
 
-    CONSTRAINT ck_subcategoria_cor
-        CHECK (cor ~ '^#[0-9A-Fa-f]{6}$')
 );
 
 CREATE UNIQUE INDEX uk_subcategoria_conta_nome

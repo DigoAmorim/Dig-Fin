@@ -48,6 +48,11 @@ CREATE TABLE IF NOT EXISTS digfin.transacao (
     )
 );
 
-CREATE INDEX ix_transacao_conta_data ON digfin.transacao (conta_id, data_lancamento);
-CREATE INDEX ix_transacao_conta_grupo ON digfin.transacao (conta_id, grupo_parcelamento);
-CREATE INDEX ix_transacao_conta_subcategoria ON digfin.transacao (conta_id, subcategoria_id);
+CREATE INDEX IF NOT EXISTS ix_transacao_conta_data
+ON digfin.transacao (conta_id, data_lancamento);
+
+CREATE INDEX IF NOT EXISTS ix_transacao_conta_grupo
+ON digfin.transacao (conta_id, grupo_parcelamento);
+
+CREATE INDEX IF NOT EXISTS ix_transacao_conta_subcategoria
+ON digfin.transacao (conta_id, subcategoria_id);

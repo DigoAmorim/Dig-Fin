@@ -1,11 +1,14 @@
 import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from '../types/categoria.ts';
+import { CrudService } from './api-service.ts';
 import { api, request } from './api-client.ts';
 
+const categoriaCrud = new CrudService<Categoria, CategoriaInput, CategoriaInput, CategoriaResponse>('/categorias');
+
 export const categoriaApi = {
-  list: (): Promise<CategoriaResponse> => request(() => api.get<CategoriaResponse>('/categorias')),
-  create: (input: CategoriaInput): Promise<Categoria> => request(() => api.post<Categoria>('/categorias', input)),
-  update: (id: number, input: CategoriaInput): Promise<Categoria> => request(() => api.put<Categoria>(`/categorias/${id}`, input)),
-  remove: (id: number): Promise<void> => request(() => api.delete<void>(`/categorias/${id}`)),
+  list: categoriaCrud.list,
+  create: categoriaCrud.create,
+  update: categoriaCrud.update,
+  remove: categoriaCrud.remove,
   createSubcategory: (input: SubcategoriaInput): Promise<Subcategoria> => (
     request(() => api.post<Subcategoria>('/categorias/subcategorias', input))
   ),

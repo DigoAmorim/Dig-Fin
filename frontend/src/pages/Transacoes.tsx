@@ -2,7 +2,7 @@ import { type FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { addMonths, format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Plus, Receipt, WalletCards } from 'lucide-react';
+import { ArrowDown, ArrowUp, ChevronLeft, ChevronRight, Plus, Trash2, WalletCards } from 'lucide-react';
 import { toast } from 'sonner';
 import { categoriaApi } from '../lib/categoria-api.ts';
 import { cartaoCreditoApi } from '../lib/cartao-credito-api.ts';
@@ -24,6 +24,7 @@ import { PageHeader } from '../components/page-header.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover.tsx';
 import { MonthPicker } from '../components/ui/month-picker.tsx';
 import { type TransacoesColumnId, useTransacoesGridState } from '../components/transacoes-grid-columns.tsx';
+import { TransacoesFilterBar, type TransactionFilters } from '../components/transacoes-filter-bar.tsx';
 
 type TransactionType = 'expense' | 'income' | 'transfer';
 interface ExpenseFormState {
@@ -58,6 +59,13 @@ const formatDate = (date: string) => format(parseISO(date), 'dd/MM/yyyy');
 const formatCurrency = (amount: number) => amount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const valueColorClass = (amount: number) => amount > 0 ? 'text-emerald-600' : amount < 0 ? 'text-rose-600' : 'text-slate-500';
 const currentMonth = () => format(new Date(), 'yyyy-MM');
+const emptyFilters = (): TransactionFilters => ({
+  search: '',
+  type: '',
+  accountId: '',
+  cardId: '',
+  subcategoryIds: [],
+});
 
 function shiftMonth(month: string, offset: number) {
   return format(addMonths(parseISO(`${month}-01`), offset), 'yyyy-MM');
@@ -76,6 +84,8 @@ export function Transacoes() {
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [formError, setFormError] = useState('');
+  const [deletingTransaction, setDeletingTransaction] = useState<Transacao | null>(null);
+  const [filters, setFilters] = useState<TransactionFilters>(emptyFilters);
   const grid = useTransacoesGridState();
 
   useEffect(() => {
@@ -94,7 +104,18 @@ export function Transacoes() {
   }, [t]);
 
   const monthTransactions = useMemo(() => {
-    const filtered = transactions.filter((transaction) => transaction.competenceDate.slice(0, 7) === month);
+    const query = filters.search.trim().toLocaleLowerCase('pt-BR');
+    const filtered = transactions.filter((transaction) => {
+      if (transaction.competenceDate.slice(0, 7) !== month) return false;
+      if (filters.type && transaction.type !== filters.type) return false;
+      if (filters.accountId && transaction.accountId !== filters.accountId) return false;
+      if (filters.cardId && transaction.cardId !== filters.cardId) return false;
+      if (filters.subcategoryIds.length > 0 && !filters.subcategoryIds.includes(String(transaction.subcategoryId))) return false;
+      if (query && ![transaction.description, transaction.accountName, transaction.cardName, transaction.subcategoryName]
+        .filter(Boolean)
+        .some((value) => value?.toLocaleLowerCase('pt-BR').includes(query))) return false;
+      return true;
+    });
     const direction = grid.sortDir === 'asc' ? 1 : -1;
 
     return filtered.sort((first, second) => {
@@ -125,7 +146,7 @@ export function Transacoes() {
       }
       return comparison * direction || first.id.localeCompare(second.id);
     });
-  }, [grid.sortBy, grid.sortDir, month, transactions]);
+  }, [filters, grid.sortBy, grid.sortDir, month, transactions]);
 
   const renderSortIcon = (column: TransacoesColumnId) => {
     if (grid.sortBy !== column) return null;
@@ -181,6 +202,18 @@ export function Transacoes() {
     setForm(emptyForm());
     setFormError('');
     setIsFormOpen(true);
+  };
+
+  const removeTransaction = async () => {
+    if (!deletingTransaction) return;
+    try {
+      await transacaoApi.remove(deletingTransaction.id);
+      setTransactions((current) => current.filter((transaction) => transaction.installmentGroupId !== deletingTransaction.installmentGroupId));
+      setDeletingTransaction(null);
+      toast.success(t('transactions.deleted'));
+    } catch (error) {
+      toast.error(translateApiError(error));
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -290,6 +323,21 @@ export function Transacoes() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={!!deletingTransaction} onOpenChange={(open) => { if (!open) setDeletingTransaction(null); }}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{t('transactions.deleteTitle')}</DialogTitle></DialogHeader>
+          <p className="text-sm text-slate-600">
+            {deletingTransaction?.type === 'transfer'
+              ? t('transactions.deleteTransferConfirmation')
+              : t('transactions.deleteConfirmation')}
+          </p>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setDeletingTransaction(null)}>{t('common.cancel')}</Button>
+            <Button type="button" variant="destructive" onClick={removeTransaction}>{t('common.delete')}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {loadError && <p role="alert" className="text-sm text-rose-600">{loadError}</p>}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
         <div><p className="text-xs font-semibold uppercase tracking-wider text-slate-400">{t('transactions.period')}</p><p className="mt-1 text-lg font-semibold text-slate-900">{monthButtonLabel(month)}</p></div>
@@ -331,8 +379,16 @@ export function Transacoes() {
         </div>
       </div>
 
+      <TransacoesFilterBar
+        filters={filters}
+        onFiltersChange={setFilters}
+        accounts={accounts}
+        cards={cards}
+        subcategories={subcategories}
+      />
+
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4"><div><h2 className="text-sm font-semibold text-slate-800">{t('transactions.launches')}</h2><p className="mt-1 text-xs text-slate-500">{isLoading ? t('common.loading') : `${monthTransactions.length} ${t('transactions.found')}`}</p></div><Receipt size={20} className="text-slate-300" /></div>
+        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4"><div><h2 className="text-sm font-semibold text-slate-800">{t('transactions.launches')}</h2><p className="mt-1 text-xs text-slate-500">{isLoading ? t('common.loading') : `${monthTransactions.length} ${t('transactions.found')}`}</p></div></div>
         {isLoading && <p className="px-5 py-6 text-sm text-slate-500">{t('common.loading')}</p>}
         {monthTransactions.length === 0 ? <div className="flex flex-col items-center gap-2 px-5 py-12 text-center"><WalletCards size={30} className="text-slate-300" /><p className="text-sm text-slate-500">{t('transactions.empty')}</p></div> : <Table><TableHeader><TableRow className="bg-slate-50">
           <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('date')}>{t('transactions.launchDateColumn')}{renderSortIcon('date')}</button></TableHead>
@@ -342,7 +398,8 @@ export function Transacoes() {
           <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('installment')}>{t('transactions.installmentColumn')}{renderSortIcon('installment')}</button></TableHead>
           <TableHead><button type="button" className={sortableHeaderClass} onClick={() => grid.toggleSort('subcategory')}>{t('transactions.subcategoryColumn')}{renderSortIcon('subcategory')}</button></TableHead>
           <TableHead className="text-right"><button type="button" className={`ml-auto ${sortableHeaderClass}`} onClick={() => grid.toggleSort('amount')}>{t('transactions.amountColumn')}{renderSortIcon('amount')}</button></TableHead>
-        </TableRow></TableHeader><TableBody>{monthTransactions.map((transaction) => <TableRow key={transaction.id} className="border-slate-100"><TableCell className="text-slate-500">{formatDate(transaction.date)}</TableCell><TableCell className="font-medium text-slate-800">{transaction.description}</TableCell><TableCell className="text-slate-500">{transaction.accountName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.cardName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.installment}/{transaction.installments}</TableCell><TableCell className="text-slate-600">{transaction.subcategoryName}</TableCell><TableCell className={`text-right font-mono font-semibold ${valueColorClass(transaction.amount)}`}>{formatCurrency(transaction.amount)}</TableCell></TableRow>)}</TableBody></Table>}
+          <TableHead className="text-center">{t('common.actions')}</TableHead>
+        </TableRow></TableHeader><TableBody>{monthTransactions.map((transaction) => <TableRow key={transaction.id} className="border-slate-100"><TableCell className="text-slate-500">{formatDate(transaction.date)}</TableCell><TableCell className="font-medium text-slate-800">{transaction.description}</TableCell><TableCell className="text-slate-500">{transaction.accountName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.cardName ?? '-'}</TableCell><TableCell className="text-slate-500">{transaction.installment}/{transaction.installments}</TableCell><TableCell className="text-slate-600">{transaction.subcategoryName ?? '-'}</TableCell><TableCell className={`text-right font-mono font-semibold ${valueColorClass(transaction.amount)}`}>{formatCurrency(transaction.amount)}</TableCell><TableCell><div className="flex items-center justify-center"><button type="button" onClick={() => setDeletingTransaction(transaction)} title={t('common.delete')} aria-label={t('transactions.deleteLabel')} className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"><Trash2 size={13} /></button></div></TableCell></TableRow>)}</TableBody></Table>}
       </div>
     </div>
   );

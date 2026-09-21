@@ -13,7 +13,6 @@ interface SubcategoriaRow extends QueryResultRow {
     id: string;
     categoryId: string | null;
     name: string;
-    color: string;
     icon: string;
 }
 
@@ -23,7 +22,7 @@ const categorySelect = `
 `;
 
 const subcategorySelect = `
-    SELECT id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
+    SELECT id::text AS id, categoria_id::text AS "categoryId", nome AS name, icone AS icon
     FROM digfin.subcategoria
 `;
 
@@ -115,11 +114,11 @@ export class CategoriaRepository {
     async createSubcategory(input: SubcategoriaInput): Promise<Subcategoria> {
         const result = await pool.query<SubcategoriaRow>(
             `
-                INSERT INTO digfin.subcategoria (conta_id, categoria_id, nome, cor, icone)
-                VALUES ($1, $2, $3, $4, $5)
-                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
+                INSERT INTO digfin.subcategoria (conta_id, categoria_id, nome, icone)
+                VALUES ($1, $2, $3, $4)
+                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, icone AS icon
             `,
-            [this.contaId, input.categoryId, input.name, input.color, input.icon],
+            [this.contaId, input.categoryId, input.name, input.icon],
         );
         const subcategory = result.rows[0];
         if (!subcategory) throw new Error('Could not create subcategory.');
@@ -130,11 +129,11 @@ export class CategoriaRepository {
         const result = await pool.query<SubcategoriaRow>(
             `
                 UPDATE digfin.subcategoria
-                SET categoria_id = $1, nome = $2, cor = $3, icone = $4, atualizado_em = NOW()
-                WHERE id = $5 AND conta_id = $6
-                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, cor AS color, icone AS icon
+                SET categoria_id = $1, nome = $2, icone = $3, atualizado_em = NOW()
+                WHERE id = $4 AND conta_id = $5
+                RETURNING id::text AS id, categoria_id::text AS "categoryId", nome AS name, icone AS icon
             `,
-            [input.categoryId, input.name, input.color, input.icon, id, this.contaId],
+            [input.categoryId, input.name, input.icon, id, this.contaId],
         );
         return result.rows[0] ? mapSubcategory(result.rows[0]) : null;
     }

@@ -21,13 +21,11 @@ export interface Subcategoria {
     id: number;
     categoryId: number | null;
     name: string;
-    color: string;
     icon: string;
 }
 
 export interface SubcategoriaInput {
     categoryId: number | null;
     name: string;
-    color: string;
     icon: string;
 }
