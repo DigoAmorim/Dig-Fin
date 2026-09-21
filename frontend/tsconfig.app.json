@@ -27,11 +27,5 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"],
-  "exclude": [
-    "src/components/transaction-dialog.tsx",
-    "src/pages/transactions.tsx",
-    "src/components/month-stepper.tsx",
-    "src/components/transactions-page-actions.tsx"
-  ]
+  "include": ["src"]
 }

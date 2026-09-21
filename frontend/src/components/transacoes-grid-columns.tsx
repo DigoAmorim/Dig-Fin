@@ -16,7 +16,7 @@ type StoredSort = {
   dir: TransacoesSortDir
 }
 
-const STORAGE_KEY = 'securo.transacoes.sort'
+const STORAGE_KEY = 'digfin.transacoes.sort'
 const DEFAULT_SORT: StoredSort = { by: null, dir: 'asc' }
 
 function isColumnId(value: unknown): value is TransacoesColumnId {

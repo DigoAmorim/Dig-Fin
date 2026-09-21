@@ -1,0 +1,39 @@
+import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { CartaoCredito } from '../types/cartao-credito.ts';
+import type { ContaBancaria } from '../types/conta-bancaria.ts';
+import type { Subcategoria } from '../types/categoria.ts';
+import type { TransactionFormState } from '../hooks/use-transaction-form.ts';
+import type { TransactionOrigin } from '../types/transacao.ts';
+import { Button } from './ui/button.tsx';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog.tsx';
+import { Input } from './ui/input.tsx';
+import { DatePickerInput } from './ui/date-picker-input.tsx';
+import { Label } from './ui/label.tsx';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select.tsx';
+
+interface TransactionFormDialogProps {
+  open: boolean;
+  form: TransactionFormState;
+  error: string;
+  subcategories: Subcategoria[];
+  accounts: ContaBancaria[];
+  cards: CartaoCredito[];
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  onUpdate: <K extends keyof TransactionFormState>(key: K, value: TransactionFormState[K]) => void;
+  onTypeChange: (type: TransactionFormState['type']) => void;
+  onOriginChange: (origin: TransactionOrigin) => void;
+}
+
+export function TransactionFormDialog({ open, form, error, subcategories, accounts, cards, onOpenChange, onSubmit, onUpdate, onTypeChange, onOriginChange }: TransactionFormDialogProps) {
+  const { t } = useTranslation();
+  return <Dialog open={open} onOpenChange={onOpenChange}><DialogContent><DialogHeader><DialogTitle>{t('transactions.new')}</DialogTitle></DialogHeader><form onSubmit={onSubmit} onInvalid={(event) => (event.target as HTMLInputElement).setCustomValidity(t('common.required'))} onInput={(event) => (event.target as HTMLInputElement).setCustomValidity('')} className="max-h-[75vh] space-y-4 overflow-y-auto pr-1">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2"><div className="space-y-2"><Label htmlFor="transaction-type" required>{t('transactions.type')}</Label><Select name="transactionType" required value={form.type} onValueChange={(value) => onTypeChange(value as TransactionFormState['type'])}><SelectTrigger id="transaction-type"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="expense">{t('transactions.expense')}</SelectItem><SelectItem value="income">{t('transactions.income')}</SelectItem><SelectItem value="transfer">{t('transactions.transfer')}</SelectItem></SelectContent></Select></div><div className="space-y-2"><Label htmlFor="transaction-date" required>{t('transactions.date')}</Label><DatePickerInput id="transaction-date" aria-label={t('transactions.date')} value={form.date} onChange={(value) => onUpdate('date', value)} className="w-full justify-start" /></div></div>
+    {form.type !== 'transfer' && <div className="space-y-2"><Label htmlFor="transaction-description" required>{t('transactions.description')}</Label><Input id="transaction-description" value={form.description} onChange={(event) => onUpdate('description', event.target.value)} maxLength={50} placeholder={t('transactions.descriptionPlaceholder')} required /><p className="text-right text-xs text-slate-400">{form.description.length}/50</p></div>}
+    {form.type === 'transfer' && <div className="space-y-4"><div className="space-y-2"><Label htmlFor="transaction-source-account" required>{t('transactions.sourceAccount')}</Label><Select required value={form.accountId || undefined} onValueChange={(value) => onUpdate('accountId', value)}><SelectTrigger id="transaction-source-account"><SelectValue placeholder={t('transactions.sourceAccountPlaceholder')} /></SelectTrigger><SelectContent>{accounts.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent></Select></div><div className="space-y-2"><Label htmlFor="transaction-destination-account" required>{t('transactions.destinationAccount')}</Label><Select required value={form.destinationAccountId || undefined} onValueChange={(value) => onUpdate('destinationAccountId', value)}><SelectTrigger id="transaction-destination-account"><SelectValue placeholder={t('transactions.destinationAccountPlaceholder')} /></SelectTrigger><SelectContent>{accounts.filter((item) => item.id !== form.accountId).map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent></Select></div></div>}
+    {form.type !== 'transfer' && <><div className="space-y-2"><Label htmlFor="transaction-subcategory" required>{t('transactions.subcategory')}</Label><Select required value={form.subcategoryId || undefined} onValueChange={(value) => onUpdate('subcategoryId', value)}><SelectTrigger id="transaction-subcategory"><SelectValue placeholder={t('transactions.subcategoryPlaceholder')} /></SelectTrigger><SelectContent>{subcategories.map((item) => <SelectItem key={item.id} value={String(item.id)}>{item.name}</SelectItem>)}</SelectContent></Select></div><div className="space-y-2"><Label htmlFor="transaction-origin" required>{t('transactions.origin')}</Label><Select required value={form.origin || undefined} onValueChange={(value) => onOriginChange(value as TransactionOrigin)}><SelectTrigger id="transaction-origin"><SelectValue placeholder={t('transactions.originPlaceholder')} /></SelectTrigger><SelectContent>{form.type === 'expense' ? <><SelectItem value="card">{t('transactions.card')}</SelectItem><SelectItem value="pix">{t('transactions.pix')}</SelectItem><SelectItem value="withdrawal">{t('transactions.withdrawal')}</SelectItem></> : <><SelectItem value="card_refund">{t('transactions.cardRefund')}</SelectItem><SelectItem value="pix">{t('transactions.pix')}</SelectItem><SelectItem value="deposit">{t('transactions.deposit')}</SelectItem></>}</SelectContent></Select></div>{form.origin === 'card' || form.origin === 'card_refund' ? <><div className="space-y-2"><Label htmlFor="transaction-card" required>{t('transactions.card')}</Label><Select required value={form.cardId || undefined} onValueChange={(value) => onUpdate('cardId', value)}><SelectTrigger id="transaction-card"><SelectValue placeholder={t('creditCards.brandPlaceholder')} /></SelectTrigger><SelectContent>{cards.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent></Select></div><div className="space-y-2"><Label htmlFor="transaction-installments" required>{t('transactions.installments')}</Label><Input id="transaction-installments" type="number" min="1" step="1" value={form.installments} onChange={(event) => onUpdate('installments', event.target.value)} required /></div></> : form.origin ? <div className="space-y-2"><Label htmlFor="transaction-account" required>{t('transactions.account')}</Label><Select required value={form.accountId || undefined} onValueChange={(value) => onUpdate('accountId', value)}><SelectTrigger id="transaction-account"><SelectValue placeholder={t('transactions.accountPlaceholder')} /></SelectTrigger><SelectContent>{accounts.map((item) => <SelectItem key={item.id} value={item.id}>{item.name}</SelectItem>)}</SelectContent></Select></div> : null}</>}
+    <div className="space-y-2"><Label htmlFor="transaction-amount" required>{form.type === 'transfer' ? t('transactions.transferAmount') : form.type === 'income' ? t('transactions.incomeAmount') : t('transactions.expenseAmount')}</Label><Input id="transaction-amount" type="number" min="0.01" step="0.01" value={form.installmentAmount} onChange={(event) => onUpdate('installmentAmount', event.target.value)} required /></div>
+    {error && <p role="alert" className="text-sm text-rose-600">{error}</p>}<DialogFooter><Button type="button" variant="outline" onClick={() => onOpenChange(false)}>{t('common.cancel')}</Button><Button type="submit">{t('common.save')}</Button></DialogFooter>
+  </form></DialogContent></Dialog>;
+}

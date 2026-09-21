@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "lint": "oxlint --ignore-pattern src/components/transaction-dialog.tsx",
+    "lint": "oxlint",
     "preview": "vite preview"
   },
   "dependencies": {
