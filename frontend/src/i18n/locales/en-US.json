@@ -12,6 +12,21 @@
     "searchIcon": "Search icon...",
     "noIconsFound": "No icons found."
   },
+  "auth": {
+    "loginTitle": "Sign in to your account",
+    "registerTitle": "Create your account",
+    "loginDescription": "Access your financial planning securely.",
+    "registerDescription": "Start organizing your financial life.",
+    "email": "Email",
+    "password": "Password",
+    "loginAction": "Sign in",
+    "registerAction": "Create account",
+    "switchToLogin": "I already have an account",
+    "switchToRegister": "I don't have an account yet",
+    "loginError": "Could not sign in. Check your email and password.",
+    "registerError": "Could not create the account. Check the information provided.",
+    "logout": "Sign out"
+  },
   "navigation": {
     "accounts": "Accounts",
     "settings": "Settings",

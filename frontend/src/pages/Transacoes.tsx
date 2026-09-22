@@ -11,7 +11,7 @@ import { transacaoApi } from '../lib/transacao-api.ts';
 import { translateApiError } from '../lib/api-error.ts';
 import type { CartaoCredito } from '../types/cartao-credito.ts';
 import type { ContaBancaria } from '../types/conta-bancaria.ts';
-import type { Subcategoria } from '../types/Categoria.ts';
+import type { Subcategoria } from '../types/categoria.ts';
 import type { Transacao } from '../types/transacao.ts';
 import { Button } from '../components/ui/button.tsx';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/Dialog.tsx';

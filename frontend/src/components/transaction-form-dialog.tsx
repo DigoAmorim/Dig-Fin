@@ -2,7 +2,7 @@ import type { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CartaoCredito } from '../types/cartao-credito.ts';
 import type { ContaBancaria } from '../types/conta-bancaria.ts';
-import type { Subcategoria } from '../types/Categoria.ts';
+import type { Subcategoria } from '../types/categoria.ts';
 import type { TransactionFormState } from '../hooks/use-transaction-form.ts';
 import type { TransactionOrigin } from '../types/transacao.ts';
 import { Button } from './ui/button.tsx';

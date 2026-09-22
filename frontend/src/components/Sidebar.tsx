@@ -175,7 +175,7 @@ export function Sidebar({ activePage, setActivePage }: SidebarProps) {
             <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
           </div>
         </div>
-        <button type="button" onClick={() => void logout()} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-red-600" aria-label="Sair" title="Sair">
+        <button type="button" onClick={() => void logout()} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-red-600" aria-label={t('auth.logout')} title={t('auth.logout')}>
           <LogOut className="w-4 h-4" />
         </button>
       </div>

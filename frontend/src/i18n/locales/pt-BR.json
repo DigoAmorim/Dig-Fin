@@ -12,6 +12,21 @@
     "searchIcon": "Buscar ícone...",
     "noIconsFound": "Nenhum ícone encontrado."
   },
+  "auth": {
+    "loginTitle": "Entrar na sua conta",
+    "registerTitle": "Criar sua conta",
+    "loginDescription": "Acesse seu planejamento financeiro com segurança.",
+    "registerDescription": "Comece a organizar sua vida financeira.",
+    "email": "E-mail",
+    "password": "Senha",
+    "loginAction": "Entrar",
+    "registerAction": "Criar conta",
+    "switchToLogin": "Já tenho uma conta",
+    "switchToRegister": "Ainda não tenho uma conta",
+    "loginError": "Não foi possível entrar. Verifique seu e-mail e senha.",
+    "registerError": "Não foi possível criar a conta. Verifique os dados informados.",
+    "logout": "Sair"
+  },
   "navigation": {
     "accounts": "Contas",
     "settings": "Configurações",

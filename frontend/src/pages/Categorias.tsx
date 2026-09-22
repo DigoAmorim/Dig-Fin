@@ -5,7 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { categoriaApi } from '../lib/categoria-api.ts';
 import { translateApiError } from '../lib/api-error.ts';
-import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/Categoria.ts';
+import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/categoria.ts';
 import { Button } from '../components/ui/button.tsx';
 import { Input } from '../components/ui/input.tsx';
 import { Label } from '../components/ui/label.tsx';
