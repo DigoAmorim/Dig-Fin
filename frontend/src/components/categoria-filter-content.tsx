@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { DropdownMenuCheckboxItem, DropdownMenuItem } from './ui/dropdown-menu';
-import type { Subcategoria } from '../types/categoria.ts';
+import type { Subcategoria } from '../types/Categoria.ts';
 
 interface CategoriaFilterContentProps {
   selectedIds: string[];

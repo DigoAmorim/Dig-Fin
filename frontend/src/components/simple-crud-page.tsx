@@ -2,7 +2,7 @@ import type { FormEvent, ReactNode } from 'react';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Button } from './ui/button.tsx';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog.tsx';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/Dialog.tsx';
 import { PageHeader } from './page-header.tsx';
 import type { CrudEntity } from '../hooks/use-crud-resource.ts';
 

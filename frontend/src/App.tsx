@@ -3,6 +3,8 @@ import { Layout } from './components/layout';
 import { Dashboard } from './pages/dashboard';
 import { Toaster } from './components/ui/sonner';
 import type { PageKey } from './config/navigation';
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import { LoginPage } from './auth/LoginPage';
 
 const CardBrands = lazy(() => import('./pages/bandeira-cartao').then(({ CardBrands }) => ({ default: CardBrands })));
 const BankInstitutions = lazy(() => import('./pages/instituicao-bancaria').then(({ BankInstitutions }) => ({ default: BankInstitutions })));
@@ -28,7 +30,22 @@ function PageSkeleton() {
 }
 
 function App() {
+  return (
+    <AuthProvider>
+      <AuthenticatedApp />
+    </AuthProvider>
+  );
+}
+
+function AuthenticatedApp() {
+  const { isLoading, isAuthenticated } = useAuth();
   const [activePage, setActivePage] = useState<PageKey>('dashboard');
+
+  if (isLoading) {
+    return <div className="flex min-h-screen items-center justify-center bg-slate-100 text-sm text-slate-500">Carregando sessao...</div>;
+  }
+
+  if (!isAuthenticated) return <LoginPage />;
 
   return (
     <>

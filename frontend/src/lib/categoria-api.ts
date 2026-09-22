@@ -1,4 +1,4 @@
-import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from '../types/categoria.ts';
+import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from '../types/Categoria.ts';
 import { CrudService } from './api-service.ts';
 import { api, request } from './api-client.ts';
 

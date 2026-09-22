@@ -1,11 +1,10 @@
 import { ErroAplicacao } from '../../shared/errors/AppError';
-import { env } from '../../config/Env';
 import { BandeiraCartaoRepository } from './BandeiraCartaoRepository';
 import { isPostgresError } from '../../shared/database/PostgresError';
 import type { BandeiraCartao, BandeiraCartaoInput } from './BandeiraCartaoTypes';
 
 export class BandeiraCartaoService {
-    constructor(private readonly repository = new BandeiraCartaoRepository(env.contaId)) {}
+    constructor(private readonly repository: BandeiraCartaoRepository) {}
 
     async findAll(): Promise<BandeiraCartao[]> {
         return this.repository.findAll();

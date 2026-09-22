@@ -1,11 +1,10 @@
-import { env } from '../../config/Env';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { TransacaoRepository } from './TransacaoRepository';
 import type { Transacao, TransacaoInput, TransacaoUpdateInput } from './TransacaoTypes';
 import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class TransacaoService {
-    constructor(private readonly repository = new TransacaoRepository(env.contaId)) {}
+    constructor(private readonly repository: TransacaoRepository) {}
 
     async findAll(): Promise<Transacao[]> {
         return this.repository.findAll();

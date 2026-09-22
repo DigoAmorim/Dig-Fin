@@ -6,5 +6,10 @@ const toPositiveInteger = (value: string | undefined, fallback: number): number 
 export const env = {
     port: toPositiveInteger(process.env.PORT, 3000),
     corsOrigin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
-    contaId: process.env.CONTA_ID ?? '00000000-0000-0000-0000-000000000001',
+    jwtAccessSecret: process.env.JWT_ACCESS_SECRET ?? 'development-only-change-this-secret',
+    jwtIssuer: process.env.JWT_ISSUER ?? 'dig-fin-api',
+    jwtAudience: process.env.JWT_AUDIENCE ?? 'dig-fin-web',
+    accessTokenMinutes: toPositiveInteger(process.env.ACCESS_TOKEN_MINUTES, 15),
+    refreshTokenDays: toPositiveInteger(process.env.REFRESH_TOKEN_DAYS, 7),
+    cookieSecure: process.env.COOKIE_SECURE === 'true',
 };

@@ -1,11 +1,10 @@
 import { ErroAplicacao } from '../../shared/errors/AppError';
-import { env } from '../../config/Env';
 import { InstituicaoBancariaRepository } from './InstituicaoBancariaRepository';
 import type { InstituicaoBancaria, InstituicaoBancariaInput } from './InstituicaoBancariaTypes';
 import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class InstituicaoBancariaService {
-    constructor(private readonly repository = new InstituicaoBancariaRepository(env.contaId)) {}
+    constructor(private readonly repository: InstituicaoBancariaRepository) {}
 
     async findAll(): Promise<InstituicaoBancaria[]> {
         return this.repository.findAll();

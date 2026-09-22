@@ -1,11 +1,10 @@
-import { env } from '../../config/Env';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { CategoriaRepository } from './CategoriaRepository';
 import type { Categoria, CategoriaInput, CategoriaResponse, Subcategoria, SubcategoriaInput } from './CategoriaTypes';
 import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class CategoriaService {
-    constructor(private readonly repository = new CategoriaRepository(env.contaId)) {}
+    constructor(private readonly repository: CategoriaRepository) {}
 
     async findAll(): Promise<CategoriaResponse> {
         return this.repository.findAll();

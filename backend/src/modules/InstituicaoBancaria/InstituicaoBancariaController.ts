@@ -1,13 +1,17 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { InstituicaoBancariaService } from './InstituicaoBancariaService';
+import { InstituicaoBancariaRepository } from './InstituicaoBancariaRepository';
+import { requireAccountId } from '../../shared/auth/RequireAccount';
 
 export class InstituicaoBancariaController {
-    constructor(private readonly service = new InstituicaoBancariaService()) {}
+    private getService(request: Request): InstituicaoBancariaService {
+        return new InstituicaoBancariaService(new InstituicaoBancariaRepository(requireAccountId(request)));
+    }
 
-    findAll = async (_request: Request, response: Response, next: NextFunction): Promise<void> => {
+    findAll = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.json(await this.service.findAll());
+            response.json(await this.getService(request).findAll());
         } catch (error) {
             next(error);
         }
@@ -15,7 +19,7 @@ export class InstituicaoBancariaController {
 
     create = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.status(201).json(await this.service.create(request.body));
+            response.status(201).json(await this.getService(request).create(request.body));
         } catch (error) {
             next(error);
         }
@@ -23,7 +27,7 @@ export class InstituicaoBancariaController {
 
     update = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.json(await this.service.update(this.getId(request), request.body));
+            response.json(await this.getService(request).update(this.getId(request), request.body));
         } catch (error) {
             next(error);
         }
@@ -31,7 +35,7 @@ export class InstituicaoBancariaController {
 
     delete = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            await this.service.delete(this.getId(request));
+            await this.getService(request).delete(this.getId(request));
             response.sendStatus(204);
         } catch (error) {
             next(error);

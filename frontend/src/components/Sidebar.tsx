@@ -3,14 +3,15 @@ import { useTranslation } from 'react-i18next';
 import {
   ArrowRightLeft,
   Building2,
-  ChevronDown,
   CreditCard,
   ChevronRight,
   Tags,
   Target,
   Receipt,
   Wallet,
+  LogOut,
 } from 'lucide-react';
+import { useAuth } from '../auth/AuthContext';
 import type { PageKey } from '../config/navigation';
 
 // 1. Definimos o que o Sidebar precisa receber de fora (Props)
@@ -21,6 +22,7 @@ interface SidebarProps {
 
 export function Sidebar({ activePage, setActivePage }: SidebarProps) {
   const { t } = useTranslation();
+  const { user, logout } = useAuth();
   const [expandedSections, setExpandedSections] = useState({
     accounts: true,
     settings: true,
@@ -170,10 +172,12 @@ export function Sidebar({ activePage, setActivePage }: SidebarProps) {
           </div>
           <div className="truncate">
             <p className="text-xs font-medium text-slate-800 truncate">{t('common.personal')}</p>
-            <p className="text-[10px] text-slate-500 truncate">demo@digfin.app</p>
+            <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
           </div>
         </div>
-        <ChevronDown className="w-4 h-4 text-slate-400 cursor-pointer" />
+        <button type="button" onClick={() => void logout()} className="rounded-md p-1.5 text-slate-400 hover:bg-white hover:text-red-600" aria-label="Sair" title="Sair">
+          <LogOut className="w-4 h-4" />
+        </button>
       </div>
     </aside>
   );

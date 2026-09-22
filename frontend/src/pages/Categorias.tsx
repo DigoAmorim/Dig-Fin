@@ -5,7 +5,7 @@ import type { LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { categoriaApi } from '../lib/categoria-api.ts';
 import { translateApiError } from '../lib/api-error.ts';
-import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/categoria.ts';
+import type { Categoria, CategoriaInput, Subcategoria, SubcategoriaInput } from '../types/Categoria.ts';
 import { Button } from '../components/ui/button.tsx';
 import { Input } from '../components/ui/input.tsx';
 import { Label } from '../components/ui/label.tsx';
@@ -15,7 +15,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/dialog.tsx';
+} from '../components/ui/Dialog.tsx';
 import { PageHeader } from '../components/page-header.tsx';
 import { ICON_MAP } from '../lib/category-icons.ts';
 import { IconPicker } from '../components/icon-picker.tsx';

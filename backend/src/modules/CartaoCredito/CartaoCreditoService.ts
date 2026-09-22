@@ -1,11 +1,10 @@
-import { env } from '../../config/Env';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { CartaoCreditoRepository } from './CartaoCreditoRepository';
 import type { CartaoCredito, CartaoCreditoInput } from './CartaoCreditoTypes';
 import { isPostgresError } from '../../shared/database/PostgresError';
 
 export class CartaoCreditoService {
-    constructor(private readonly repository = new CartaoCreditoRepository(env.contaId)) {}
+    constructor(private readonly repository: CartaoCreditoRepository) {}
 
     async findAll(): Promise<CartaoCredito[]> {
         return this.repository.findAll();

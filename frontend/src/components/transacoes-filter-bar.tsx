@@ -6,7 +6,7 @@ import { Button } from './ui/button';
 import { CategoriaFilterContent } from './categoria-filter-content';
 import type { CartaoCredito } from '../types/cartao-credito.ts';
 import type { ContaBancaria } from '../types/conta-bancaria.ts';
-import type { Subcategoria } from '../types/categoria.ts';
+import type { Subcategoria } from '../types/Categoria.ts';
 import type { TransactionType } from '../types/transacao.ts';
 
 export interface TransactionFilters {

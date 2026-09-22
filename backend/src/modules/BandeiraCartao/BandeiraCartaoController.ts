@@ -1,13 +1,17 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ErroAplicacao } from '../../shared/errors/AppError';
 import { BandeiraCartaoService } from './BandeiraCartaoService';
+import { BandeiraCartaoRepository } from './BandeiraCartaoRepository';
+import { requireAccountId } from '../../shared/auth/RequireAccount';
 
 export class BandeiraCartaoController {
-    constructor(private readonly service = new BandeiraCartaoService()) {}
+    private getService(request: Request): BandeiraCartaoService {
+        return new BandeiraCartaoService(new BandeiraCartaoRepository(requireAccountId(request)));
+    }
 
-    findAll = async (_request: Request, response: Response, next: NextFunction): Promise<void> => {
+    findAll = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.json(await this.service.findAll());
+            response.json(await this.getService(request).findAll());
         } catch (error) {
             next(error);
         }
@@ -15,7 +19,7 @@ export class BandeiraCartaoController {
 
     create = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.status(201).json(await this.service.create(request.body));
+            response.status(201).json(await this.getService(request).create(request.body));
         } catch (error) {
             next(error);
         }
@@ -23,7 +27,7 @@ export class BandeiraCartaoController {
 
     update = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            response.json(await this.service.update(this.getId(request), request.body));
+            response.json(await this.getService(request).update(this.getId(request), request.body));
         } catch (error) {
             next(error);
         }
@@ -31,7 +35,7 @@ export class BandeiraCartaoController {
 
     delete = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
         try {
-            await this.service.delete(this.getId(request));
+            await this.getService(request).delete(this.getId(request));
             response.sendStatus(204);
         } catch (error) {
             next(error);
