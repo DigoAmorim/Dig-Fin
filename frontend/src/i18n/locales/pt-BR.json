@@ -36,7 +36,8 @@
     "bankInstitutions": "Instituição Bancária",
     "bankAccounts": "Conta Bancária",
     "creditCards": "Cartão de Crédito",
-    "categories": "Categorias"
+    "categories": "Categorias",
+    "pluggy": "Conectar banco"
   },
   "header": {
     "categorized": "Todas as transações categorizadas"
@@ -119,7 +120,8 @@
     "transactionAmountInvalid": "O valor da transação é inválido.",
     "transactionReferenceNotFound": "Uma referência da transação não foi encontrada.",
     "transactionBusinessRuleViolation": "A transação viola uma regra de negócio.",
-    "internal": "Erro interno do servidor."
+    "internal": "Erro interno do servidor.",
+    "pluggyNotConfigured": "A integração Pluggy ainda não está configurada no servidor."
   },
   "cardBrands": {
     "section": "Bandeiras do Cartão",
@@ -260,6 +262,18 @@
     "deleted": "Subcategoria excluída com sucesso.",
     "deleteTitle": "Excluir subcategoria?",
     "deleteConfirmation": "Tem certeza que deseja excluir a subcategoria {{name}}?"
+  },
+  "pluggy": {
+    "section": "Open Finance",
+    "title": "Conectar banco",
+    "connectTitle": "Conecte uma instituição financeira",
+    "connectDescription": "Use o Pluggy para autorizar uma conexão bancária em um fluxo seguro.",
+    "connect": "Conectar instituição",
+    "reconnect": "Atualizar conexão",
+    "preparing": "Preparando conexão...",
+    "securityTitle": "Credenciais protegidas",
+    "securityDescription": "As credenciais do Pluggy ficam no backend. A tela recebe apenas um token temporário para abrir o widget.",
+    "itemLabel": "Conexão Pluggy"
   },
   "transactions": {
     "section": "Movimentações",

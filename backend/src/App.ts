@@ -13,6 +13,7 @@ import { contaBancariaRoutes } from './modules/ContaBancaria/ContaBancariaRoutes
 import { cartaoCreditoRoutes } from './modules/CartaoCredito/CartaoCreditoRoutes';
 import { categoriaRoutes } from './modules/Categoria/CategoriaRoutes';
 import { transacaoRoutes } from './modules/Transacao/TransacaoRoutes';
+import { pluggyRoutes } from './modules/Pluggy/PluggyRoutes';
 
 export const app = express();
 
@@ -44,4 +45,5 @@ app.use('/api/conta-bancaria', contaBancariaRoutes);
 app.use('/api/cartao-credito', cartaoCreditoRoutes);
 app.use('/api/categorias', categoriaRoutes);
 app.use('/api/transacoes', transacaoRoutes);
+app.use('/api/pluggy', pluggyRoutes);
 app.use(errorHandler);

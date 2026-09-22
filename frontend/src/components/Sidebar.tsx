@@ -9,6 +9,7 @@ import {
   Target,
   Receipt,
   Wallet,
+  Landmark,
   LogOut,
 } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext';
@@ -65,6 +66,15 @@ export function Sidebar({ activePage, setActivePage }: SidebarProps) {
             />
           </button>
           {expandedSections.accounts && <nav className="space-y-0.5 text-sm">
+            <button
+              onClick={() => setActivePage('pluggy')}
+              className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${
+                activePage === 'pluggy' ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              }`}
+            >
+              <Landmark className="w-4 h-4" />
+              {t('navigation.pluggy')}
+            </button>
             <button
               onClick={() => setActivePage('dashboard')}
               className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-md transition cursor-pointer ${

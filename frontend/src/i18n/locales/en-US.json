@@ -261,6 +261,18 @@
     "deleteTitle": "Delete subcategory?",
     "deleteConfirmation": "Are you sure you want to delete the subcategory {{name}}?"
   },
+  "pluggy": {
+    "section": "Open Finance",
+    "title": "Connect bank",
+    "connectTitle": "Connect a financial institution",
+    "connectDescription": "Use Pluggy to authorize a bank connection through a secure flow.",
+    "connect": "Connect institution",
+    "reconnect": "Update connection",
+    "preparing": "Preparing connection...",
+    "securityTitle": "Credentials protected",
+    "securityDescription": "Pluggy credentials stay on the backend. The screen receives only a temporary token to open the widget.",
+    "itemLabel": "Pluggy connection"
+  },
   "transactions": {
     "section": "Movements",
     "title": "Transactions",

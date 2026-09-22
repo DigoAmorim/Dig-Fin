@@ -14,7 +14,7 @@ import type { ContaBancaria } from '../types/conta-bancaria.ts';
 import type { Subcategoria } from '../types/categoria.ts';
 import type { Transacao } from '../types/transacao.ts';
 import { Button } from '../components/ui/button.tsx';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/Dialog.tsx';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '../components/ui/dialog.tsx';
 import { PageHeader } from '../components/page-header.tsx';
 import { Popover, PopoverContent, PopoverTrigger } from '../components/ui/popover.tsx';
 import { MonthPicker } from '../components/ui/month-picker.tsx';

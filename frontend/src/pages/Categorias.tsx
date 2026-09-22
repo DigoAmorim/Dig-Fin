@@ -15,7 +15,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../components/ui/Dialog.tsx';
+} from '../components/ui/dialog.tsx';
 import { PageHeader } from '../components/page-header.tsx';
 import { ICON_MAP } from '../lib/category-icons.ts';
 import { IconPicker } from '../components/icon-picker.tsx';

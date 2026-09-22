@@ -12,4 +12,7 @@ export const env = {
     accessTokenMinutes: toPositiveInteger(process.env.ACCESS_TOKEN_MINUTES, 15),
     refreshTokenDays: toPositiveInteger(process.env.REFRESH_TOKEN_DAYS, 7),
     cookieSecure: process.env.COOKIE_SECURE === 'true',
+    pluggyClientId: process.env.PLUGGY_CLIENT_ID,
+    pluggyClientSecret: process.env.PLUGGY_CLIENT_SECRET,
+    pluggyBaseUrl: process.env.PLUGGY_BASE_URL,
 };

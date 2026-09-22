@@ -12,6 +12,7 @@ const BankAccounts = lazy(() => import('./pages/conta-bancaria').then(({ BankAcc
 const CreditCards = lazy(() => import('./pages/cartao-credito').then(({ CreditCards }) => ({ default: CreditCards })));
 const Categories = lazy(() => import('./pages/categorias').then(({ Categories }) => ({ default: Categories })));
 const Transacoes = lazy(() => import('./pages/transacoes').then(({ Transacoes }) => ({ default: Transacoes })));
+const Pluggy = lazy(() => import('./pages/pluggy').then(({ Pluggy }) => ({ default: Pluggy })));
 
 function PageSkeleton() {
   return (
@@ -61,6 +62,7 @@ function AuthenticatedApp() {
           {activePage === 'bank-accounts' && <BankAccounts />}
           {activePage === 'credit-cards' && <CreditCards />}
           {activePage === 'categories' && <Categories />}
+          {activePage === 'pluggy' && <Pluggy />}
         </Suspense>
       </Layout>
       <Toaster position="bottom-right" />

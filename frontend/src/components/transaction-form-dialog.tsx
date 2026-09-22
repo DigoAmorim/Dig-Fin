@@ -6,7 +6,7 @@ import type { Subcategoria } from '../types/categoria.ts';
 import type { TransactionFormState } from '../hooks/use-transaction-form.ts';
 import type { TransactionOrigin } from '../types/transacao.ts';
 import { Button } from './ui/button.tsx';
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/Dialog.tsx';
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from './ui/dialog.tsx';
 import { Input } from './ui/input.tsx';
 import { DatePickerInput } from './ui/date-picker-input.tsx';
 import { Label } from './ui/label.tsx';

@@ -5,7 +5,8 @@ export type PageKey =
   | 'bank-institutions'
   | 'bank-accounts'
   | 'credit-cards'
-  | 'categories';
+  | 'categories'
+  | 'pluggy';
 
 export const pageTitleKeys: Record<PageKey, string> = {
   dashboard: 'navigation.overview',
@@ -15,4 +16,5 @@ export const pageTitleKeys: Record<PageKey, string> = {
   'bank-accounts': 'navigation.bankAccounts',
   'credit-cards': 'navigation.creditCards',
   categories: 'navigation.categories',
+  pluggy: 'navigation.pluggy',
 };

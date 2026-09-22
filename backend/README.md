@@ -10,6 +10,8 @@ API Node.js + Express + PostgreSQL do DigFin.
 4. Execute `npm run migrate` para aplicar as migrations pendentes.
 5. Execute `npm run dev`.
 
+Para habilitar a tela de conexão bancária, preencha `PLUGGY_CLIENT_ID` e `PLUGGY_CLIENT_SECRET` no `.env`. Essas credenciais ficam exclusivamente no backend. Sem elas, a tela continua disponível, mas o endpoint retorna uma mensagem de integração não configurada.
+
 ## Manutenção do banco
 
 O arquivo `database/schema.sql` é o bootstrap para uma instalação nova. Depois que o banco estiver criado, alterações estruturais devem ser feitas em novos arquivos numerados em `database/migrations/`, nunca editando uma migration já aplicada. A conexão compartilhada com o banco fica em `database/Pool.ts`.
@@ -45,6 +47,7 @@ Enquanto a autenticação ainda não foi implementada, `CONTA_ID` define a conta
 - Transferências são persistidas como dois lançamentos vinculados: um negativo na conta origem e um positivo na conta destino.
 - `PUT /api/categorias/subcategorias/:id`: atualiza uma subcategoria.
 - `DELETE /api/categorias/subcategorias/:id`: remove uma subcategoria.
+- `POST /api/pluggy/connect-token`: gera um Connect Token temporário para o widget Pluggy da sessão autenticada.
 
 O backend usa camadas de rotas, controllers, services e repositories. O repository é o único ponto que conhece os nomes de colunas do PostgreSQL (`descricao`); a API mantém o contrato `description` usado pelo frontend.
 

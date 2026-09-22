@@ -24,6 +24,7 @@
     "i18next": "^26.4.2",
     "jose": "^6.2.12",
     "pg": "^8.23.0",
+    "pluggy-sdk": "^0.90.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
