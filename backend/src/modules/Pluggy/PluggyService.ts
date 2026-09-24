@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { PluggyClient } from 'pluggy-sdk';
 import { pool } from '../../../database/Pool';
 import { env } from '../../config/Env';
@@ -97,6 +98,101 @@ export class PluggyService {
             matched: updated.length,
             total: localAccounts.rowCount ?? 0,
             updated,
+        };
+    }
+
+    async syncTransactions(accountId: string, from: string, to: string): Promise<{ totalAccounts: number; imported: number; removed: number; skipped: number; }> {
+        if (!this.client) throw new ErroAplicacao(503, 'pluggyNotConfigured');
+
+        const syncedAccounts = await pool.query<{ id: string; pluggyAccountId: string }>(`
+            SELECT id::text AS id,
+                   pluggy_account_id AS "pluggyAccountId"
+            FROM digfin.conta_bancaria
+            WHERE conta_id = $1
+              AND pluggy_status = 'sincronizada'
+              AND pluggy_account_id IS NOT NULL
+        `, [accountId]);
+
+        const localRows = await pool.query<{ id: string; pluggyTransactionId: string }>(`
+            SELECT id::text AS id,
+                   pluggy_transaction_id AS "pluggyTransactionId"
+            FROM digfin.transacao
+            WHERE conta_id = $1
+              AND data_lancamento >= $2::date
+              AND data_lancamento <= $3::date
+              AND pluggy_transaction_id IS NOT NULL
+        `, [accountId, from, to]);
+
+        const localPluggyIds = new Set(localRows.rows.map((row) => row.pluggyTransactionId));
+        const remotePluggyIds = new Set<string>();
+        let imported = 0;
+        let removed = 0;
+        let skipped = 0;
+
+        for (const row of syncedAccounts.rows) {
+            const response = await this.client.fetchTransactionsCursor(row.pluggyAccountId, {
+                dateFrom: from,
+                dateTo: to,
+            });
+
+            for (const transaction of response.results ?? []) {
+                if (transaction.type !== 'DEBIT' && transaction.type !== 'CREDIT') continue;
+
+                remotePluggyIds.add(transaction.id);
+
+                const exists = await pool.query<{ id: string }>(
+                    `SELECT id::text AS id
+                     FROM digfin.transacao
+                     WHERE conta_id = $1 AND pluggy_transaction_id = $2`,
+                    [accountId, transaction.id],
+                );
+
+                if (exists.rowCount && exists.rowCount > 0) {
+                    skipped += 1;
+                    continue;
+                }
+
+                const transactionDate = transaction.date instanceof Date ? transaction.date.toISOString().slice(0, 10) : new Date(transaction.date).toISOString().slice(0, 10);
+                const type = transaction.type === 'DEBIT' ? 'expense' : 'income';
+                const origin = type === 'expense' ? 'withdrawal' : 'deposit';
+                const description = String(transaction.description ?? '').trim().slice(0, 50) || 'Transação Pluggy';
+                const groupId = randomUUID();
+
+                const result = await pool.query(
+                    `INSERT INTO digfin.transacao (
+                        conta_id, tipo, descricao, data_lancamento, data_competencia,
+                        subcategoria_id, origem, conta_bancaria_id, cartao_credito_id,
+                        grupo_parcelamento, numero_parcela, total_parcelas, valor, pluggy_transaction_id
+                    )
+                    VALUES ($1, $2, $3, $4::date, $4::date, 4, $5, $6, NULL, $7, 1, 1, $8, $9)
+                    ON CONFLICT (conta_id, pluggy_transaction_id) WHERE pluggy_transaction_id IS NOT NULL DO NOTHING`,
+                    [accountId, type, description, transactionDate, origin, row.id, groupId, Number(transaction.amount), transaction.id],
+                );
+
+                if ((result.rowCount ?? 0) > 0) {
+                    imported += 1;
+                } else {
+                    skipped += 1;
+                }
+            }
+        }
+
+        const toDelete = localRows.rows.filter((row) => !remotePluggyIds.has(row.pluggyTransactionId));
+        for (const row of toDelete) {
+            await pool.query(
+                `DELETE FROM digfin.transacao
+                 WHERE conta_id = $1
+                   AND id = $2`,
+                [accountId, row.id],
+            );
+            removed += 1;
+        }
+
+        return {
+            totalAccounts: syncedAccounts.rowCount ?? 0,
+            imported,
+            removed,
+            skipped,
         };
     }
 }

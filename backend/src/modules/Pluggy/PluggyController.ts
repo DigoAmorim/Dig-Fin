@@ -36,4 +36,16 @@ export class PluggyController {
             next(error);
         }
     };
+
+    syncTransactions = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+        try {
+            if (!request.auth) throw new ErroAplicacao(401, 'authenticationRequired');
+            const from = typeof request.body?.from === 'string' ? request.body.from : undefined;
+            const to = typeof request.body?.to === 'string' ? request.body.to : undefined;
+            if (!from || !to) throw new ErroAplicacao(400, 'invalidDateRange');
+            response.json(await this.service.syncTransactions(request.auth.accountId, from, to));
+        } catch (error) {
+            next(error);
+        }
+    };
 }

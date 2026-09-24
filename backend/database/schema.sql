@@ -219,6 +219,7 @@ CREATE TABLE digfin.transacao (
     numero_parcela SMALLINT NOT NULL DEFAULT 1,
     total_parcelas SMALLINT NOT NULL DEFAULT 1,
     valor NUMERIC(14, 2) NOT NULL,
+    pluggy_transaction_id VARCHAR(255),
     criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -254,6 +255,9 @@ CREATE INDEX ix_transacao_conta_data ON digfin.transacao (conta_id, data_lancame
 CREATE INDEX ix_transacao_conta_competencia ON digfin.transacao (conta_id, data_competencia);
 CREATE INDEX ix_transacao_conta_grupo ON digfin.transacao (conta_id, grupo_parcelamento);
 CREATE INDEX ix_transacao_conta_subcategoria ON digfin.transacao (conta_id, subcategoria_id);
+CREATE UNIQUE INDEX IF NOT EXISTS ux_transacao_pluggy_transaction_id
+ON digfin.transacao (conta_id, pluggy_transaction_id)
+WHERE pluggy_transaction_id IS NOT NULL;
 
 INSERT INTO digfin.conta (id, nome)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Conta de Desenvolvimento')

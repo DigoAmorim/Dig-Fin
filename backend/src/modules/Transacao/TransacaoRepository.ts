@@ -20,6 +20,7 @@ interface TransacaoRow extends QueryResultRow {
     installments: number;
     amount: string;
     installmentGroupId: string;
+    pluggyTransactionId?: string | null;
 }
 
 const transactionSelect = `
@@ -39,7 +40,8 @@ const transactionSelect = `
         t.numero_parcela AS installment,
         t.total_parcelas AS installments,
         t.valor::text AS amount,
-        t.grupo_parcelamento::text AS "installmentGroupId"
+        t.grupo_parcelamento::text AS "installmentGroupId",
+        t.pluggy_transaction_id AS "pluggyTransactionId"
     FROM digfin.transacao t
     LEFT JOIN digfin.subcategoria s ON s.id = t.subcategoria_id AND s.conta_id = t.conta_id
     LEFT JOIN digfin.conta_bancaria cb ON cb.id = t.conta_bancaria_id AND cb.conta_id = t.conta_id

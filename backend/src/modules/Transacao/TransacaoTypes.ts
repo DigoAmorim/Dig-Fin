@@ -18,6 +18,7 @@ export interface Transacao {
     installments: number;
     amount: number;
     installmentGroupId: string;
+    pluggyTransactionId?: string | null;
 }
 
 export interface TransacaoInput {
