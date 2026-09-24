@@ -28,6 +28,18 @@ export class ContaBancariaService {
         return account;
     }
 
+    async updatePluggyMatch(id: string, pluggyAccountId: string, pluggyStatus: 'nao_sincronizada' | 'sincronizada'): Promise<ContaBancaria> {
+        const updated = await this.repository.updatePluggyStatus(id, pluggyAccountId, pluggyStatus);
+        if (!updated) {
+            throw new ErroAplicacao(404, 'bankAccountNotFound');
+        }
+        return updated;
+    }
+
+    async clearPluggyMatch(id: string): Promise<void> {
+        await this.repository.clearPluggySync(id);
+    }
+
     async delete(id: string): Promise<void> {
         try {
             const deleted = await this.repository.delete(id);

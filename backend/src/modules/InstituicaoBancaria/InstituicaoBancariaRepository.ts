@@ -44,10 +44,22 @@ export class InstituicaoBancariaRepository {
     async update(id: number, input: InstituicaoBancariaInput): Promise<InstituicaoBancaria | null> {
         const result = await pool.query<InstituicaoBancariaRow>(
             `
-                UPDATE digfin.instituicao_bancaria
-                SET nome = $1
-                WHERE id = $2 AND conta_id = $3
-                RETURNING id::text AS id, nome AS name
+                WITH updated_instituicao AS (
+                    UPDATE digfin.instituicao_bancaria
+                    SET nome = $1
+                    WHERE id = $2 AND conta_id = $3
+                    RETURNING id, nome
+                ),
+                updated_accounts AS (
+                    UPDATE digfin.conta_bancaria
+                    SET pluggy_account_id = NULL,
+                        pluggy_status = 'nao_sincronizada',
+                        atualizado_em = NOW()
+                    WHERE instituicao_bancaria_id = $2
+                      AND conta_id = $3
+                )
+                SELECT id::text AS id, nome AS name
+                FROM updated_instituicao
             `,
             [input.name, id, this.contaId],
         );

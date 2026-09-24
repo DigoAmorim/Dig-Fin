@@ -3,6 +3,8 @@ export interface ContaBancaria {
     name: string;
     bankInstitutionId: string;
     bankInstitutionName: string;
+    pluggyAccountId: string | null;
+    pluggyStatus: 'nao_sincronizada' | 'sincronizada';
 }
 
 export interface ContaBancariaInput {

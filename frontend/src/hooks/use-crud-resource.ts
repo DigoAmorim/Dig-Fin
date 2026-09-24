@@ -40,19 +40,36 @@ export function useCrudResource<TEntity extends CrudEntity, TInput>({
   const [error, setError] = useState('');
   const [formError, setFormError] = useState('');
 
+  const refresh = async () => {
+    setIsLoading(true);
+    try {
+      const loadedItems = await api.list();
+      setItems(sortItems(loadedItems));
+      setError('');
+    } catch {
+      setError(loadErrorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
 
-    api.list()
-      .then((loadedItems) => {
+    const load = async () => {
+      if (!isMounted) return;
+      setIsLoading(true);
+      try {
+        const loadedItems = await api.list();
         if (isMounted) setItems(sortItems(loadedItems));
-      })
-      .catch(() => {
+      } catch {
         if (isMounted) setError(loadErrorMessage);
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setIsLoading(false);
-      });
+      }
+    };
+
+    void load();
 
     return () => {
       isMounted = false;
@@ -126,5 +143,6 @@ export function useCrudResource<TEntity extends CrudEntity, TInput>({
     closeForm,
     save,
     remove,
+    refresh,
   };
 }

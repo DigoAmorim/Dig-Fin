@@ -25,4 +25,15 @@ export class PluggyController {
             next(error);
         }
     };
+
+    syncBankAccounts = async (request: Request, response: Response, next: NextFunction): Promise<void> => {
+        try {
+            if (!request.auth) throw new ErroAplicacao(401, 'authenticationRequired');
+            const itemId = typeof request.body?.itemId === 'string' ? request.body.itemId : undefined;
+            if (!itemId) throw new ErroAplicacao(400, 'invalidId');
+            response.json(await this.service.syncBankAccounts(request.auth.accountId, itemId));
+        } catch (error) {
+            next(error);
+        }
+    };
 }

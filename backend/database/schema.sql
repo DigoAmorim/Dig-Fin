@@ -79,6 +79,8 @@ CREATE TABLE digfin.conta_bancaria (
     conta_id UUID NOT NULL,
     nome VARCHAR(100) NOT NULL,
     instituicao_bancaria_id BIGINT NOT NULL,
+    pluggy_account_id VARCHAR(255),
+    pluggy_status VARCHAR(30) NOT NULL DEFAULT 'nao_sincronizada',
     criado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     atualizado_em TIMESTAMPTZ NOT NULL DEFAULT NOW(),
 
@@ -87,6 +89,9 @@ CREATE TABLE digfin.conta_bancaria (
 
     CONSTRAINT uk_conta_bancaria_id_conta
         UNIQUE (id, conta_id),
+
+    CONSTRAINT chk_conta_bancaria_pluggy_status
+        CHECK (pluggy_status IN ('nao_sincronizada', 'sincronizada')),
 
     CONSTRAINT fk_conta_bancaria_conta
         FOREIGN KEY (conta_id)

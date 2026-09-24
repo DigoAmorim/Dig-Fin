@@ -32,6 +32,7 @@ export interface SimpleCrudPageProps<TEntity extends CrudEntity> {
   onSetDeleting: (item: TEntity | null) => void;
   onRemove: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  extraAction?: ReactNode;
   renderForm: () => ReactNode;
   renderRow: (item: TEntity, actions: ReactNode) => ReactNode;
 }
@@ -43,7 +44,10 @@ export function SimpleCrudPage<TEntity extends CrudEntity>(props: SimpleCrudPage
   return <div className="space-y-4"><PageHeader section={page.section} title={page.title} />
     <Dialog open={page.isFormOpen} onOpenChange={(open) => { if (!open) page.onCloseForm(); }}><DialogContent><DialogHeader><DialogTitle>{page.editingItem ? page.editLabel : page.newLabel}</DialogTitle></DialogHeader><form onSubmit={page.onSubmit} onInvalid={(event) => (event.target as HTMLInputElement).setCustomValidity(t('common.required'))} onInput={(event) => (event.target as HTMLInputElement).setCustomValidity('')} className="space-y-4">{page.renderForm()}{page.formError && <p role="alert" className="text-sm text-rose-600">{page.formError}</p>}<DialogFooter><Button type="button" variant="outline" onClick={page.onCloseForm}>{t('common.cancel')}</Button><Button type="submit">{t('common.save')}</Button></DialogFooter></form></DialogContent></Dialog>
     {page.error && <p className="text-sm text-rose-600">{page.error}</p>}
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4"><p className="text-xs text-slate-500">{page.listDescription}</p><Button type="button" onClick={page.onOpenCreate} size="sm" className="gap-1.5"><Plus size={13} /> {page.addLabel}</Button></div><div className={`${columnsClassName} items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-500`}><span>{page.columnHeader}</span><span className="w-[4.5rem] text-center">{t('common.actions')}</span></div>{page.isLoading ? <p className="px-5 py-6 text-sm text-slate-500">{t('common.loading')}</p> : page.items.length === 0 ? <p className="px-5 py-6 text-sm text-slate-500">{page.emptyLabel}</p> : <div>{page.items.map((item) => page.renderRow(item, actions(item)))}</div>}</div>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4"><p className="text-xs text-slate-500">{page.listDescription}</p><div className="flex items-center gap-2">{page.extraAction}{page.addLabel && <Button type="button" onClick={page.onOpenCreate} size="sm" className="gap-1.5"><Plus size={13} /> {page.addLabel}</Button>}</div></div><div className={`grid ${columnsClassName} items-center gap-3 border-b border-slate-200 bg-slate-50 px-5 py-2.5 text-xs font-semibold text-slate-500`}>
+      {page.columnHeader}
+      <span className="w-[4.5rem] text-center">{t('common.actions')}</span>
+    </div>{page.isLoading ? <p className="px-5 py-6 text-sm text-slate-500">{t('common.loading')}</p> : page.items.length === 0 ? <p className="px-5 py-6 text-sm text-slate-500">{page.emptyLabel}</p> : <div>{page.items.map((item) => page.renderRow(item, actions(item)))}</div>}</div>
     <Dialog open={!!page.deletingItem} onOpenChange={(open) => { if (!open) page.onSetDeleting(null); }}><DialogContent><DialogHeader><DialogTitle>{page.deleteTitle}</DialogTitle></DialogHeader><p className="text-sm text-slate-600">{page.deleteConfirmation}</p><DialogFooter><Button type="button" variant="outline" onClick={() => page.onSetDeleting(null)}>{t('common.cancel')}</Button><Button type="button" variant="destructive" onClick={page.onRemove}>{t('common.delete')}</Button></DialogFooter></DialogContent></Dialog>
   </div>;
 }
